@@ -1,14 +1,19 @@
 
 import React from 'react'
-import NavigationBar from '../components/navigation-bar/NavigationBar';
+
 import PostList from './blocks/posts/all-post/page';
+import NavigationBar from '@/components/navigation-bar/Navbar';
+
 
 
 const RootPage = () => {
   return (
-    <div>
+    <div className=" mx-auto max-w-7xl">
       <NavigationBar />
-      <PostList />
+    <PostList />
+    
+
+    
     </div>
   );
 };
