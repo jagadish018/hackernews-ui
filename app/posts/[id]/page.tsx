@@ -1,3 +1,9 @@
+
+
+import NavBar from "@/components/navigation-bar/Navbar";
+import CommentSection from "../comment-sec/CommentSection";
+
+
 type Post = {
   id: string;
   title: string;
@@ -17,16 +23,13 @@ type Post = {
   }[];
 };
 
-type tParams = Promise<{ id: string }>;
 
-export default async function PostDetail(props: { params: tParams }) {
-  const res = await fetch(
-    `http://localhost:3000/posts/${(await props.params).id}`,
-    {
-      cache: "no-store",
-      credentials: "include",
-    }
-  );
+const page = async ({ params }: { params: Promise<{ id: string }> }) => {
+  const id = (await params).id;
+  const res = await fetch(`http://localhost:3000/posts/${id}`, {
+    cache: "no-store",
+    credentials: "include",
+  });
 
   if (!res.ok) {
     return (
@@ -40,28 +43,22 @@ export default async function PostDetail(props: { params: tParams }) {
   const post: Post = data.post;
 
   return (
-    <div className="max-w-3xl mx-auto p-6 space-y-4">
-      <h1 className="text-3xl font-bold">{post.title}</h1>
-      <p className="text-gray-600 text-sm">
-        by {post.author.username} •{new Date(post.createdAt).toLocaleString()}
-      </p>
-      <p className="text-lg">{post.content}</p>
-      <hr className="my-6" />
-      <h2 className="text-2xl font-semibold">Comments</h2>
-      <div className="space-y-4">
-        {post.Comment.length === 0 && (
-          <p className="text-gray-500">No comments yet.</p>
-        )}
-        {post.Comment.map((comment) => (
-          <div key={comment.id} className="border rounded p-4">
-            <p className="font-medium">{comment.user.username}</p>
-            <p>{comment.content}</p>
-            <p className="text-xs text-gray-500">
-              {new Date(comment.createdAt).toLocaleString()}
-            </p>
-          </div>
-        ))}
+    <>
+      <div>
+        <NavBar />
       </div>
-    </div>
+      <div className="max-w-3xl mx-auto p-6 space-y-4">
+        <h1 className="text-3xl font-bold">{post.title}</h1>
+        <p className="text-gray-600 text-sm">
+          by {post.author.username} •{" "}
+          {new Date(post.createdAt).toLocaleString()}
+        </p>
+        <p className="text-lg">{post.content}</p>
+        <hr className="my-6" />
+        <CommentSection postId={id} />
+      </div>
+    </>
   );
-}
+};
+
+export default page;
