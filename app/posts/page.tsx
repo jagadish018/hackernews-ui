@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { LikeButton } from "./likes/LikeButton";
+import { betterAuthClient } from "@/lib/integrations/better-auth";
 
 type Post = {
   id: string;
@@ -15,6 +17,8 @@ export default function PostList() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const { data } = betterAuthClient.useSession();
+  const currUser = data?.user.id || "";
 
   const fetchPosts = async () => {
     try {
@@ -48,7 +52,9 @@ export default function PostList() {
       {posts.map((post) => (
         <div
           key={post.id}
-          onClick={() => router.push(`/posts/${post.id}`)}
+          onClick={() => {
+            // no navigation for now, just keeping the click disabled
+          }}
           className="border p-4 rounded shadow cursor-pointer hover:bg-gray-50 transition"
         >
           <h2 className="text-xl font-semibold">{post.title}</h2>
@@ -57,15 +63,21 @@ export default function PostList() {
             {new Date(post.createdAt).toLocaleString()}
           </p>
 
-          <button
-            onClick={(e) => {
-              e.stopPropagation(); // prevents navigation on comment button click
-              router.push(`/blocks/comments`);
-            }}
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200"
-          >
-            Comment
-          </button>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4 mt-3">
+            <button
+              onClick={(e) => {
+                e.stopPropagation(); // prevent triggering the div click
+                router.push(`/posts/comment-sec/${post.id}`);
+              }}
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200 w-full sm:w-auto"
+            >
+              Comment
+            </button>
+
+            <div className="w-full sm:w-auto">
+              <LikeButton postId={post.id} currentUserId={currUser} />
+            </div>
+          </div>
         </div>
       ))}
     </div>

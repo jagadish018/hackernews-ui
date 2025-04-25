@@ -1,8 +1,5 @@
-
-
 import NavBar from "@/components/navigation-bar/Navbar";
-import CommentSection from "../comment-sec/CommentSection";
-
+import CommentSection from "../../comment-sec/CommentSection";
 
 type Post = {
   id: string;
@@ -22,7 +19,6 @@ type Post = {
     };
   }[];
 };
-
 
 const page = async ({ params }: { params: Promise<{ id: string }> }) => {
   const id = (await params).id;
@@ -48,13 +44,12 @@ const page = async ({ params }: { params: Promise<{ id: string }> }) => {
         <NavBar />
       </div>
       <div className="max-w-3xl mx-auto p-6 space-y-4">
-        <h1 className="text-3xl font-bold">{post.title}</h1>
-        <p className="text-gray-600 text-sm">
-          by {post.author.username} •{" "}
-          {new Date(post.createdAt).toLocaleString()}
+        <h1 className="text-2xl font-bold">{post.title}</h1>
+        <p className="text-gray-500 mb-2">
+          {new Date(post.createdAt).toLocaleString()} by {post.author.username}
         </p>
-        <p className="text-lg">{post.content}</p>
-        <hr className="my-6" />
+        <p className="mb-4">{post.content}</p>
+
         <CommentSection postId={id} />
       </div>
     </>
