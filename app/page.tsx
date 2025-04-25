@@ -1,8 +1,8 @@
 
 import React from 'react'
 
-import PostList from './blocks/posts/all-post/page';
 import NavigationBar from '@/components/navigation-bar/Navbar';
+import PostList from './posts/page';
 
 
 
