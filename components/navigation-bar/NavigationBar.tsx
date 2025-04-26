@@ -1,6 +1,5 @@
 "use client";
 
-import UserMe from "@/app/blocks/user/page";
 import { betterAuthClient } from "@/lib/integrations/better-auth";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -16,7 +15,7 @@ const rightLinks = [
 export default function NavigationBar() {
   const router = useRouter();
   const { data: session, isPending } = betterAuthClient.useSession();
-   const userName = session?.user?.name;
+   
 
   const handleSignOut = async () => {
     await betterAuthClient.signOut({
