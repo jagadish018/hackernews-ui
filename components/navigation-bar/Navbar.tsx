@@ -20,10 +20,10 @@ const NavBar = () => {
           </button>
         ) : (
           <div className="flex flex-row items-center gap-4">
-            <button
+            <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 cursor-pointer" 
               onClick={() => {
-                betterAuthClient.signIn.email({
-                  email: "kabir@gmail.com",
+                betterAuthClient.signIn.username({
+                  username: "kabir",
                   password: "HelloWorld@123",
                 });
               }}
@@ -35,6 +35,7 @@ const NavBar = () => {
                 betterAuthClient.signUp.email({
                   name: "Kabi",
                   email: "kabir@gmail.com",
+                  username: "kabir",
                   password: "HelloWorld@123",
                 });
               }}
