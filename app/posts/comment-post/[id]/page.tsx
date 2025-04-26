@@ -23,7 +23,7 @@ type Post = {
 const page = async ({ params }: { params: Promise<{ id: string }> }) => {
   const id = (await params).id;
   const res = await fetch(
-    `https://hackernews.mangohill-f34a947a.centralindia.azurecontainerapps.io/posts/${id}`,
+    `https://hackernews.agreeablesmoke-a4d23e0d.centralindia.azurecontainerapps.io/posts/${id}`,
     {
       cache: "no-store",
       credentials: "include",

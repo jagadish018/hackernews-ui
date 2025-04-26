@@ -33,7 +33,7 @@ const CommentSection = ({ postId }: { postId: string }) => {
     setMessage("");
     try {
       const res = await fetch(
-        `https://hackernews.mangohill-f34a947a.centralindia.azurecontainerapps.io/comments/on/${postId}`,
+        `https://hackernews.agreeablesmoke-a4d23e0d.centralindia.azurecontainerapps.io/comments/on/${postId}`,
         {
           credentials: "include",
         }
@@ -62,7 +62,7 @@ const CommentSection = ({ postId }: { postId: string }) => {
 
     try {
       const res = await fetch(
-        `https://hackernews.mangohill-f34a947a.centralindia.azurecontainerapps.io/comments/on/${postId}`,
+        `https://hackernews.agreeablesmoke-a4d23e0d.centralindia.azurecontainerapps.io/comments/on/${postId}`,
         {
           method: "POST",
           credentials: "include",
@@ -94,7 +94,7 @@ const CommentSection = ({ postId }: { postId: string }) => {
 
     try {
       const res = await fetch(
-        `https://hackernews.mangohill-f34a947a.centralindia.azurecontainerapps.io/comments/${id}`,
+        `https://hackernews.agreeablesmoke-a4d23e0d.centralindia.azurecontainerapps.io/comments/${id}`,
         {
           method: "DELETE",
           credentials: "include",
@@ -125,7 +125,7 @@ const CommentSection = ({ postId }: { postId: string }) => {
 
     try {
       const res = await fetch(
-        `https://hackernews.mangohill-f34a947a.centralindia.azurecontainerapps.io/comments/on/${id}`,
+        `https://hackernews.agreeablesmoke-a4d23e0d.centralindia.azurecontainerapps.io/comments/on/${id}`,
         {
           method: "PATCH",
           credentials: "include",
