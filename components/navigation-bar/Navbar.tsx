@@ -1,7 +1,7 @@
 "use client";
 
 import { betterAuthClient } from "@/lib/integrations/better-auth";
-import React, { useEffect } from "react";
+
 
 const NavBar = () => {
   const { data, refetch } = betterAuthClient.useSession(); // Use refetch to refresh session
