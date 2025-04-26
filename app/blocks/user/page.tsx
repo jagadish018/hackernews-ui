@@ -17,7 +17,7 @@ export default function UserMe() {
     const fetchMe = async () => {
       try {
         const res = await fetch(
-          "hhttps://hackernews.mangohill-f34a947a.centralindia.azurecontainerapps.io/users/me",
+          "https://hackernews.mangohill-f34a947a.centralindia.azurecontainerapps.io/users/me",
           {
             credentials: "include",
           }

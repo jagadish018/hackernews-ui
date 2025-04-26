@@ -12,14 +12,17 @@ export default function CreatePost() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const res = await fetch("http://localhost:3000/posts", {
-      method: "POST",
-      credentials: "include", // important for cookies/session
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ title, content }),
-    });
+    const res = await fetch(
+      "https://hackernews.mangohill-f34a947a.centralindia.azurecontainerapps.io/posts",
+      {
+        method: "POST",
+        credentials: "include", // important for cookies/session
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ title, content }),
+      }
+    );
 
     const data = await res.json();
     if (res.ok) {

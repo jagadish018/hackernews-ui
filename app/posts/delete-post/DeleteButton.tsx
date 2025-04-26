@@ -28,10 +28,13 @@ export const DeleteButton = ({
 
     try {
       setLoading(true);
-      const res = await fetch(`http://localhost:3000/posts/${postId}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
+      const res = await fetch(
+        `https://hackernews.mangohill-f34a947a.centralindia.azurecontainerapps.io/posts/${postId}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
 
       const data = await res.json();
 

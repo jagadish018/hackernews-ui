@@ -1,6 +1,6 @@
 export const likePost = async (postId: string) => {
   const res = await fetch(
-    `https://hackernews.mangohill-f34a947a.centralindia.azurecontainerapps.io/likes/on/${postId}`,
+    `https://hackernews.agreeablesmoke-a4d23e0d.centralindia.azurecontainerapps.io/likes/on/${postId}`,
     {
       method: "POST",
       credentials: "include",
@@ -11,7 +11,7 @@ export const likePost = async (postId: string) => {
 
 export const unlikePost = async (postId: string) => {
   const res = await fetch(
-    `https://hackernews.mangohill-f34a947a.centralindia.azurecontainerapps.io/likes/on/${postId}`,
+    `https://hackernews.agreeablesmoke-a4d23e0d.centralindia.azurecontainerapps.io/likes/on/${postId}`,
     {
       method: "DELETE",
       credentials: "include",
@@ -22,7 +22,7 @@ export const unlikePost = async (postId: string) => {
 
 export const getLikes = async (postId: string) => {
   const res = await fetch(
-    `https://hackernews.mangohill-f34a947a.centralindia.azurecontainerapps.io/likes/on/${postId}`,
+    `https://hackernews.agreeablesmoke-a4d23e0d.centralindia.azurecontainerapps.io/likes/on/${postId}`,
     {
       method: "GET",
       credentials: "include",
