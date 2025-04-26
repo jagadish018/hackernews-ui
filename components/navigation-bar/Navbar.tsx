@@ -6,11 +6,12 @@ import React from "react";
 
 const NavBar = () => {
   const router = useRouter();
-  const { data } = betterAuthClient.useSession();
+  const { data, refetch } = betterAuthClient.useSession();
   const user = data?.user;
 
   const handleSignOut = async () => {
     await betterAuthClient.signOut();
+    await refetch(); // Refresh session after sign out
     router.push("/");
   };
 
@@ -34,7 +35,8 @@ const NavBar = () => {
             |
             <button onClick={() => router.push("/posts/past-post")}>
               past
-            </button>|
+            </button>{" "}
+            |
             <button onClick={() => router.push("/posts/post-curr")}>
               show
             </button>
@@ -53,7 +55,7 @@ const NavBar = () => {
         <div className="flex items-center text-black text-sm">
           {user ? (
             <>
-              <span className="mr-1">{user.name} (1)</span>
+              <span className="mr-1">{user.name || user.username} (1)</span>
               <span className="mx-1">|</span>
               <button onClick={handleSignOut} className="hover:underline">
                 logout

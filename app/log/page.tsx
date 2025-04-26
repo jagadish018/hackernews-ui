@@ -8,8 +8,8 @@ import SignUpForm from "./components/SignUpForm";
 import { useRouter } from "next/navigation";
 
 const LoginPage = () => {
-    const { data } = betterAuthClient.useSession();
-    const router = useRouter();
+  const { data, refetch } = betterAuthClient.useSession();
+  const router = useRouter();
 
   const [formData, setFormData] = useState({
     username: "",
@@ -32,22 +32,33 @@ const LoginPage = () => {
   };
 
   const handleSignIn = async () => {
-    await betterAuthClient.signIn.username({
-      username: loginData.username,
-      password: loginData.password,
-    });
+    try {
+      await betterAuthClient.signIn.username({
+        username: loginData.username,
+        password: loginData.password,
+      });
+      await refetch(); // Important to refresh session after login
       router.push("/");
-      
+    } catch (error) {
+      console.error("Login failed", error);
+      alert("Login failed. Please check your credentials.");
+    }
   };
 
   const handleSignUp = async () => {
-    await betterAuthClient.signUp.email({
-      email: formData.email,
-      name: formData.name,
-      username: formData.username,
-      password: formData.password,
-    });
+    try {
+      await betterAuthClient.signUp.email({
+        email: formData.email,
+        name: formData.name,
+        username: formData.username,
+        password: formData.password,
+      });
+      await refetch(); // Refresh session after signup
       router.push("/");
+    } catch (error) {
+      console.error("Signup failed", error);
+      alert("Signup failed. Please try again.");
+    }
   };
 
   return (
