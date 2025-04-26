@@ -1,4 +1,3 @@
-// log/components/SignUpForm.tsx
 import React from "react";
 
 interface SignUpFormProps {

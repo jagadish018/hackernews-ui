@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { betterAuthClient } from "@/lib/integrations/better-auth";
-import React from "react";
+import React, { useEffect } from "react";
 
 const NavBar = () => {
   const router = useRouter();
@@ -12,7 +12,7 @@ const NavBar = () => {
   const handleSignOut = async () => {
     await betterAuthClient.signOut();
     await refetch(); // Refresh session after sign out
-    router.push("/");
+    router.push("/log"); // Go back to login page
   };
 
   return (
@@ -55,7 +55,7 @@ const NavBar = () => {
         <div className="flex items-center text-black text-sm">
           {user ? (
             <>
-              <span className="mr-1">{user.name || user.username} (1)</span>
+              <span className="mr-1">{user.name || user.username}</span>
               <span className="mx-1">|</span>
               <button onClick={handleSignOut} className="hover:underline">
                 logout

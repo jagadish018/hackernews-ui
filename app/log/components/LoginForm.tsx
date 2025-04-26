@@ -1,16 +1,12 @@
-// log/components/LoginForm.tsx
-
 import React from "react";
 
 interface LoginFormProps {
-  
   loginData: {
     username: string;
     password: string;
   };
   handleChangeLogin: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSignIn: () => void;
-
 }
 
 const LoginForm = ({
