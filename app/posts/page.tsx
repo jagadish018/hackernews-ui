@@ -27,9 +27,12 @@ export default function PostList() {
   const fetchPosts = async () => {
     try {
       setLoading(true);
-      const res = await fetch("http://localhost:3000/posts?page=1&limit=20", {
-        credentials: "include",
-      });
+      const res = await fetch(
+        "https://hackernews-ui-flax.vercel.app/posts?page=1&limit=20",
+        {
+          credentials: "include",
+        }
+      );
       const data = await res.json();
 
       if (!res.ok) {
