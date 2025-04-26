@@ -2,14 +2,18 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { LikeButton } from "./likes/LikeButton";
+import { LikeButton } from "./like-post/LikeButton";
 import { betterAuthClient } from "@/lib/integrations/better-auth";
+import { DeleteButton } from "./delete-post/DeleteButton";
 
 type Post = {
   id: string;
   title: string;
   content: string;
   createdAt: string;
+  author: {
+    id: string;
+  };
 };
 
 export default function PostList() {
@@ -67,16 +71,21 @@ export default function PostList() {
             <button
               onClick={(e) => {
                 e.stopPropagation(); // prevent triggering the div click
-                router.push(`/posts/comment-sec/${post.id}`);
+                router.push(`/posts/comment-post/${post.id}`);
               }}
               className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200 w-full sm:w-auto"
             >
               Comment
             </button>
-
             <div className="w-full sm:w-auto">
               <LikeButton postId={post.id} currentUserId={currUser} />
             </div>
+            <DeleteButton
+              postId={post.id}
+              currentUserId={currUser}
+              postOwnerId={post.author.id}
+              onDelete={fetchPosts}
+            />
           </div>
         </div>
       ))}

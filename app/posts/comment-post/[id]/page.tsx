@@ -1,5 +1,5 @@
 import NavBar from "@/components/navigation-bar/Navbar";
-import CommentSection from "../../comment-sec/CommentSection";
+import CommentSection from "../CommentSection";
 
 type Post = {
   id: string;
