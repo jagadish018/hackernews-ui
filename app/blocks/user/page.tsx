@@ -16,9 +16,12 @@ export default function UserMe() {
   useEffect(() => {
     const fetchMe = async () => {
       try {
-        const res = await fetch("http://localhost:3000/users/me", {
-          credentials: "include",
-        });
+        const res = await fetch(
+          "hhttps://hackernews.mangohill-f34a947a.centralindia.azurecontainerapps.io/users/me",
+          {
+            credentials: "include",
+          }
+        );
 
         const data = await res.json();
 
