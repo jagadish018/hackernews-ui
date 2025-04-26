@@ -52,31 +52,29 @@ export default function PostList() {
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (
-    <div className="space-y-4 p-4 mx-auto max-w-7xl">
+    <div className="space-y-1 p-1 mx-auto max-w-7xl">
       {posts.map((post) => (
         <div
           key={post.id}
-          onClick={() => {
-            // no navigation for now, just keeping the click disabled
-          }}
-          className="border p-4 rounded shadow cursor-pointer hover:bg-gray-50 transition"
+          className="border p-2 rounded  cursor-pointer hover:bg-gray-50 transition"
         >
-          <h2 className="text-xl font-semibold">{post.title}</h2>
-          <p className="mb-2">{post.content}</p>
-          <p className="text-sm text-gray-500 mb-2">
-            {new Date(post.createdAt).toLocaleString()}
-          </p>
+          <h4
+            onClick={() => router.push(`/posts/${post.id}`)}
+            className="text-l font-semibold"
+          >
+            {post.title}
+          </h4>
 
           <div className="flex flex-col sm:flex-row sm:items-center gap-4 mt-3">
-            <button
+            <span
               onClick={(e) => {
-                e.stopPropagation(); // prevent triggering the div click
+                e.stopPropagation(); // Prevent outer click
                 router.push(`/posts/comment-post/${post.id}`);
               }}
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200 w-full sm:w-auto"
+              className="text-blue-600 hover:underline cursor-pointer text-sm"
             >
               Comment
-            </button>
+            </span>
             <div className="w-full sm:w-auto">
               <LikeButton postId={post.id} currentUserId={currUser} />
             </div>

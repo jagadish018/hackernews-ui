@@ -30,23 +30,18 @@ const NavBar = () => {
           </span>
 
           <span className="flex flex-row gap-2 ml-4 text-black">
-            <button onClick={() => router.push("/posts/new-post")}>
-              new
-            </button>  | 
-            
+            <button onClick={() => router.push("/posts/new-post")}>new</button>{" "}
+            |
             <button onClick={() => router.push("/posts/past-post")}>
               past
+            </button>|
+            <button onClick={() => router.push("/posts/post-curr")}>
+              show
             </button>
-            | <button onClick={() => router.push("/comments")}>comments</button>{" "}
-            | <button onClick={() => router.push("/ask")}>ask</button> |{" "}
-            <button onClick={() => router.push("/show")}>show</button> |{" "}
-            <button onClick={() => router.push("/jobs")}>jobs</button>{" "}
             {user && (
               <>
                 |{" "}
-                <button
-                  onClick={() => router.push("/posts/create-post")}
-                >
+                <button onClick={() => router.push("/posts/create-post")}>
                   submit
                 </button>
               </>

@@ -65,10 +65,10 @@ export const LikeButton = ({ postId, currentUserId }: Props) => {
       <button
         onClick={liked ? handleUnlike : handleLike}
         disabled={loading}
-        className="text-xl"
+        className={`text-xl ${liked ? "text-blue-500" : "text-red-700"} transition-colors duration-200`}
         aria-label={liked ? "Unlike" : "Like"}
       >
-        {liked ? <SlDislike size={20} /> : <SlLike size={20} />}
+        {liked ? <SlDislike size={15} /> : <SlLike size={15} />}
       </button>
       <span className="ml-2">{likeCount}</span>
     </div>

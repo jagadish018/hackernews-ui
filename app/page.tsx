@@ -5,9 +5,11 @@ import PostList from "./posts/page";
 
 const RootPage = () => {
   return (
-    <div className=" mx-auto max-w-7xl">
+    <div className=" mx-auto max-w-7xl  bg-[#F6F6EF] h-screen">
       <NavigationBar />
-      <PostList />
+      <div className=" ">
+        <PostList />
+      </div>
     </div>
   );
 };
