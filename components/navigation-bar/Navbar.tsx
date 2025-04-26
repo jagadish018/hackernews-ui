@@ -1,17 +1,12 @@
 "use client";
 
 import { betterAuthClient } from "@/lib/integrations/better-auth";
-import React, { useState, useEffect } from "react";
+import React from "react";
+import { useRouter } from "next/navigation";
 
 const NavBar = () => {
-  const { data, refetch } = betterAuthClient.useSession();
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (data !== undefined) {
-      setLoading(false);
-    }
-  }, [data]);
+  const { data } = betterAuthClient.useSession();
+  const router = useRouter();
 
   const handleLogin = async () => {
     if (!data?.user) {
@@ -19,7 +14,7 @@ const NavBar = () => {
         username: "kabir",
         password: "HelloWorld@123",
       });
-      await refetch();
+      router.refresh(); // <-- refresh page to update session
     }
   };
 
@@ -31,18 +26,14 @@ const NavBar = () => {
         username: "kabir",
         password: "HelloWorld@123",
       });
-      await refetch();
+      router.refresh(); // <-- refresh page to update session
     }
   };
 
   const handleSignOut = async () => {
     await betterAuthClient.signOut();
-    await refetch();
+    router.refresh(); // <-- refresh page to clear session
   };
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
 
   return (
     <div className="container mx-auto py-4">
