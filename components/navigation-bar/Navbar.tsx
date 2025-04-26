@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { betterAuthClient } from "@/lib/integrations/better-auth";
-import React, { useEffect } from "react";
+
 
 const NavBar = () => {
   const router = useRouter();
