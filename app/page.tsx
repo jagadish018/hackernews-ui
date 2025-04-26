@@ -1,12 +1,13 @@
 import React from "react";
 
-import NavigationBar from "@/components/navigation-bar/Navbar";
+
 import PostList from "./posts/page";
+import NavigationBar from "@/components/navigation-bar/NavigationBar";
 
 const RootPage = () => {
   return (
     <div className=" mx-auto max-w-7xl  bg-[#F6F6EF] h-screen">
-      <NavigationBar />
+    <NavigationBar />
       <div className=" ">
         <PostList />
       </div>
