@@ -11,7 +11,7 @@ const RootPage = () => {
       <NavBar />
       
       <div className=" ">
-        <PostList />
+   
       </div>
     </div>
   );
