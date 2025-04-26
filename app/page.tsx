@@ -1,7 +1,7 @@
 import React from "react";
 
 
-import PostList from "./posts/page";
+
 import NavBar from "@/components/navigation-bar/Navbar";
 
 
