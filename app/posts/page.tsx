@@ -28,7 +28,7 @@ export default function PostList() {
     try {
       setLoading(true);
       const res = await fetch(
-        "https://hackernews.mangohill-f34a947a.centralindia.azurecontainerapps.io/posts?page=1&limit=20",
+        "https://hackernews.agreeablesmoke-a4d23e0d.centralindia.azurecontainerapps.io/posts?page=1&limit=20",
         {
           credentials: "include",
         }
