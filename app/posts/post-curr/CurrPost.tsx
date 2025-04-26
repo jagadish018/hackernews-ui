@@ -22,9 +22,12 @@ export default function CurrPost() {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const res = await fetch(`http://localhost:3000/posts/me`, {
-          credentials: "include",
-        });
+        const res = await fetch(
+          `https://hackernews.mangohill-f34a947a.centralindia.azurecontainerapps.io/posts/me`,
+          {
+            credentials: "include",
+          }
+        );
 
         const data = await res.json();
 

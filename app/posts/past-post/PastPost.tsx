@@ -26,7 +26,7 @@ const PastPosts = () => {
       setLoading(true);
       try {
         const res = await fetch(
-          `http://localhost:3000/posts/past?page=${page}&limit=${limit}`
+          `https://hackernews.mangohill-f34a947a.centralindia.azurecontainerapps.io/posts/past?page=${page}&limit=${limit}`
         );
         const data = await res.json();
         if (res.ok) {

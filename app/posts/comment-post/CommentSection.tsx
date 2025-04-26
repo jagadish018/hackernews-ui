@@ -32,9 +32,12 @@ const CommentSection = ({ postId }: { postId: string }) => {
     setLoading(true);
     setMessage("");
     try {
-      const res = await fetch(`http://localhost:3000/comments/on/${postId}`, {
-        credentials: "include",
-      });
+      const res = await fetch(
+        `https://hackernews.mangohill-f34a947a.centralindia.azurecontainerapps.io/comments/on/${postId}`,
+        {
+          credentials: "include",
+        }
+      );
       const data = await res.json();
       if (res.ok) {
         setComments(data.comments || []);
@@ -58,14 +61,17 @@ const CommentSection = ({ postId }: { postId: string }) => {
     }
 
     try {
-      const res = await fetch(`http://localhost:3000/comments/on/${postId}`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ content: newComment }),
-      });
+      const res = await fetch(
+        `https://hackernews.mangohill-f34a947a.centralindia.azurecontainerapps.io/comments/on/${postId}`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ content: newComment }),
+        }
+      );
 
       const data = await res.json();
       if (res.ok) {
@@ -87,10 +93,13 @@ const CommentSection = ({ postId }: { postId: string }) => {
     if (!confirmed) return;
 
     try {
-      const res = await fetch(`http://localhost:3000/comments/${id}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
+      const res = await fetch(
+        `https://hackernews.mangohill-f34a947a.centralindia.azurecontainerapps.io/comments/${id}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
 
       if (res.ok) {
         setMessage("🗑️ Comment deleted.");
@@ -115,14 +124,17 @@ const CommentSection = ({ postId }: { postId: string }) => {
     }
 
     try {
-      const res = await fetch(`http://localhost:3000/comments/on/${id}`, {
-        method: "PATCH",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ content: editContent }),
-      });
+      const res = await fetch(
+        `https://hackernews.mangohill-f34a947a.centralindia.azurecontainerapps.io/comments/on/${id}`,
+        {
+          method: "PATCH",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ content: editContent }),
+        }
+      );
 
       if (res.ok) {
         setMessage("✅ Comment updated.");

@@ -22,10 +22,13 @@ type Post = {
 
 const page = async ({ params }: { params: Promise<{ id: string }> }) => {
   const id = (await params).id;
-  const res = await fetch(`http://localhost:3000/posts/${id}`, {
-    cache: "no-store",
-    credentials: "include",
-  });
+  const res = await fetch(
+    `https://hackernews.mangohill-f34a947a.centralindia.azurecontainerapps.io/posts/${id}`,
+    {
+      cache: "no-store",
+      credentials: "include",
+    }
+  );
 
   if (!res.ok) {
     return (
