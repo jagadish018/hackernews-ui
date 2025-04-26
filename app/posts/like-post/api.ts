@@ -4,6 +4,7 @@ export const likePost = async (postId: string) => {
     {
       method: "POST",
       credentials: "include",
+      
     }
   );
   return res.json();

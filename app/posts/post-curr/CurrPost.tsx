@@ -23,7 +23,7 @@ export default function CurrPost() {
     const fetchPosts = async () => {
       try {
         const res = await fetch(
-          `https://hackernews.mangohill-f34a947a.centralindia.azurecontainerapps.io/posts/me`,
+          `https://hackernews.agreeablesmoke-a4d23e0d.centralindia.azurecontainerapps.io/posts/me`,
           {
             credentials: "include",
           }
