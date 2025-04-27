@@ -2,6 +2,8 @@
 import "./globals.css";
 import { PropsWithChildren } from "react";
 import { Inter } from "next/font/google";
+import { Toaster } from "@/components/ui/sonner";
+import { Providers } from "./providers";
 
 
 
@@ -10,7 +12,8 @@ export default function RootLayout(props: PropsWithChildren) {
   return (
     <html lang="en" className={inter.className}>
       <body>
-          {props.children}
+        <Providers>{props.children}</Providers>
+        <Toaster />
       </body>
     </html>
   );

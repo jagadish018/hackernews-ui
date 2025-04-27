@@ -4,10 +4,10 @@ import { betterAuthClient } from "@/lib/auth";
 import { AuthUIProvider } from "@daveyplate/better-auth-ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import type { ReactNode } from "react";
+import type { PropsWithChildren } from "react";
 
 
-export function Providers({ children }: { children: ReactNode }) {
+export function Providers(props:PropsWithChildren) {
   const router = useRouter();
 
   return (
@@ -21,7 +21,7 @@ export function Providers({ children }: { children: ReactNode }) {
       }}
       Link={Link}
     >
-      {children}
+      {props.children}
     </AuthUIProvider>
   );
 }

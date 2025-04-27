@@ -1,122 +1,65 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import Link from "next/link";
+
 import { betterAuthClient } from "@/lib/auth";
+import Link from "next/link";
 
-type User = {
-  id: string;
-  name: string;
-  email: string;
-  emailVerified: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-  image?: string | null;
-  username?: string | null;
-  displayUsername?: string | null;
-};
 
-type Session = {
-  id: string;
-  expiresAt: Date;
-  token: string;
-  createdAt: Date;
-  updatedAt: Date;
-  ipAddress?: string | null;
-  userAgent?: string | null;
-  userId: string;
-};
+const rightLinks = [
+  { label: "| new", href: "/blocks/posts/new-post" },
+  { label: "| past", href: "/blocks/posts/past-post" },
+  { label: "| Posts", href: "/blocks/posts/all-post" },
+  { label: "| create", href: "/blocks/posts/create-post" },
+];
 
-type AuthSession = {
-  user: User;
-  session: Session;
-} | null;
+export default function NavigationBar() {
+  const session = betterAuthClient.useSession(); // Get user session
 
-const Navbar = () => {
-  const [session, setSession] = useState<AuthSession>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const checkSession = async () => {
-      try {
-        const { data } = await betterAuthClient.getSession();
-        setSession(data);
-      } catch (error) {
-        console.error("Session check failed:", error);
-        setSession(null);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    checkSession();
-  }, []);
-
-  const handleSignOut = async () => {
-    try {
-      await betterAuthClient.signOut();
-      setSession(null);
-      window.location.href = "/";
-    } catch (error) {
-      console.error("Sign out failed:", error);
-    }
-  };
-
-  const navItems = [
-    { label: "new", href: "/new-post" },
-    { label: "past", href: "/past-post" },
-    { label: "comments", href: "#" },
-    { label: "my post", href: "/post-curr" },
-    { label: "submit", href: "/create-post" },
-  ];
-
-  if (isLoading) {
-    return (
-      <nav className="bg-orange-600 text-black text-sm font-sans max-w-screen-lg mx-auto w-full">
-        <div className="w-full flex items-center justify-between px-3 py-1">
-          <div className="flex items-center flex-wrap gap-2">
-            <Link href="/" className="font-bold text-black">
-              Hacker News
-            </Link>
-          </div>
-          <div className="w-20 h-4 bg-gray-300 animate-pulse rounded"></div>
-        </div>
-      </nav>
-    );
-  }
+  const authLinks = session.data?.user
+    ? [
+        // If signed in
+        { label: "Sign Out", href: "/auth/sign-out" },
+        { label: "Settings", href: "/auth/settings" },
+      ]
+    : [
+        // If not signed in
+        { label: "Sign In", href: "/auth/sign-in" },
+        { label: "Forgot Password", href: "/auth/forgot-password" },
+        { label: "Reset Password", href: "/auth/reset-password" },
+      ];
 
   return (
-    <nav className="bg-orange-600 text-black text-sm font-sans max-w-screen-lg mx-auto w-full">
-      <div className="w-full flex items-center justify-between px-3 py-1">
-        <div className="flex items-center flex-wrap gap-2">
-          <Link href="/" className="font-bold text-black">
-            Hacker News
-          </Link>
-          {navItems.map((item) => (
-            <React.Fragment key={item.label}>
-              <span className="text-black">|</span>
-              <Link href={item.href}>{item.label}</Link>
-            </React.Fragment>
+    <nav className="flex items-center justify-between gap-4 p-2 bg-orange-500 shadow-md mx-auto max-w-7xl sticky top-0 z-10">
+      <div className="flex items-center gap-2">
+        <span className="border h-6 w-6 border-white flex text-center items-center justify-center text-white font-extrabold">
+          Y
+        </span>
+        <Link href={"/"}>
+          <h1 className="font-extrabold">Hacker News</h1>
+        </Link>
+        <div className="flex items-center gap-4">
+          {rightLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="text-black hover:underline"
+            >
+              {link.label}
+            </Link>
           ))}
         </div>
-        <div className="flex items-center gap-2">
-          {session?.user ? (
-            <>
-              <span className="text-xs">
-                {session.user.username || session.user.name}
-              </span>
-              <button onClick={handleSignOut} className="hover:underline">
-                logout
-              </button>
-            </>
-          ) : (
-            <Link href="/sign-in" className="hover:underline">
-              login
-            </Link>
-          )}
-        </div>
+      </div>
+
+      <div className="flex items-center gap-4">
+        {authLinks.map((link) => (
+          <Link
+            key={link.href}
+            href={link.href}
+            className="text-black hover:underline"
+          >
+            {link.label}
+          </Link>
+        ))}
       </div>
     </nav>
   );
-};
-
-export default Navbar;
+}
