@@ -6,13 +6,12 @@ import { betterAuthClient } from "@/lib/auth";
 const Navbar = () => {
   const { data } = betterAuthClient.useSession();
   const navItems = [
-    { label: "new", href: "/new" },
-    { label: "past", href: "/past" },
-    { label: "comments", href: "/comments" },
-    { label: "ask", href: "/ask" },
-    { label: "show", href: "/show" },
-    { label: "jobs", href: "/jobs" },
-    { label: "submit", href: "/submit" },
+    { label: "new", href: "/new-post" },
+    { label: "past", href: "/past-post" },
+    { label: "comments", href: "#" },
+    {label: "my post", href: "/post-curr"},
+   
+    { label: "submit", href: "/create-post" },
   ];
   return (
     <nav className="bg-orange-600 text-black text-sm font-sans max-w-screen-lg mx-auto w-full">
