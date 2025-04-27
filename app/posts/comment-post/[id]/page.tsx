@@ -1,4 +1,5 @@
-import NavBar from "@/components/navigation-bar/Navbar";
+
+import { Navbar } from "@/components/navigation-bar/Navbar";
 import CommentSection from "../CommentSection";
 
 type Post = {
@@ -44,7 +45,7 @@ const page = async ({ params }: { params: Promise<{ id: string }> }) => {
   return (
     <>
       <div>
-        <NavBar />
+        <Navbar />
       </div>
       <div className="max-w-3xl mx-auto p-6 space-y-4">
         <h1 className="text-2xl font-bold">{post.title}</h1>

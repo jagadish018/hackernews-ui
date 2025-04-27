@@ -1,15 +1,20 @@
-import React from "react";
+// app/page.tsx
 
-import NavBar from "@/components/navigation-bar/Navbar";
+import { Navbar } from "@/components/navigation-bar/Navbar";
+import PostList from "./posts/page";
 
-const RootPage = () => {
+export default function RootPage() {
   return (
-    <div className=" mx-auto max-w-7xl  bg-[#F6F6EF] h-screen">
-      <NavBar />
-
-      <div className=" "></div>
+    <div className="min-h-screen bg-[#F6F6EF]">
+      <Navbar />
+      <main className="mx-auto max-w-7xl p-4">
+        <PostList />
+      </main>
+      <footer className="bg-white border-t border-gray-200 py-4 mt-8">
+        <div className="max-w-7xl mx-auto px-4 text-center text-gray-500 text-sm">
+          © {new Date().getFullYear()} HackerNews Clone
+        </div>
+      </footer>
     </div>
   );
-};
-
-export default RootPage;
+}

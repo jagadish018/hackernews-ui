@@ -1,11 +1,12 @@
 import React from "react";
 import CreatePost from "./CreatePost";
-import NavBar from "@/components/navigation-bar/Navbar";
+import { Navbar } from "@/components/navigation-bar/Navbar";
+
 
 const page = () => {
   return (
     <>
-      <NavBar />
+      <Navbar />
       <CreatePost />
     </>
   );

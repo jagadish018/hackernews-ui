@@ -1,6 +1,7 @@
 import React from "react";
 import { LikeButton } from "../LikeButton";
-import { betterAuthClient } from "@/lib/integrations/better-auth";
+import { betterAuthClient } from "@/lib/auth";
+
 
 const LikePage = async ({ params }: { params: Promise<{ id: string }> }) => {
   const id = (await params).id;

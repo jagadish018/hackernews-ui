@@ -1,4 +1,5 @@
-import NavBar from "@/components/navigation-bar/Navbar";
+import { Navbar } from "@/components/navigation-bar/Navbar";
+
 type Post = {
   id: string;
   title: string;
@@ -43,7 +44,7 @@ const page = async ({ params }: { params: Promise<{ id: string }> }) => {
     <>
       <div className="bg-[#F6F6EF] h-screen mx-auto max-w-7xl">
         <div>
-          <NavBar />
+          <Navbar/>
         </div>
         <div className="mx-auto max-w-7xl p-4 ">
           <div className=" p-2 border  cursor-pointer hover:bg-gray-50 transition">

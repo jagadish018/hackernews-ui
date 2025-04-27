@@ -1,4 +1,5 @@
-import { betterAuthClient } from "@/lib/integrations/better-auth";
+
+import { betterAuthClient } from "@/lib/auth";
 import CommentItem from "./CommentItem";
 
 type CommentListProps = {

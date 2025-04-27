@@ -1,10 +1,13 @@
+// app/posts/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { LikeButton } from "./like-post/LikeButton";
-import { betterAuthClient } from "@/lib/integrations/better-auth";
+
+import { betterAuthClient } from "@/lib/auth";
+import { withAuth } from "@/components/with-auth";
 import { DeleteButton } from "./delete-post/DeleteButton";
+import { LikeButton } from "./like-post/LikeButton";
 
 type Post = {
   id: string;
@@ -13,16 +16,18 @@ type Post = {
   createdAt: string;
   author: {
     id: string;
+    name?: string;
+    username?: string;
   };
 };
 
-export default function PostList() {
+function PostList() {
   const router = useRouter();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const { data } = betterAuthClient.useSession();
-  const currUser = data?.user.id || "";
+  const { data: session } = betterAuthClient.useSession();
+  const currUser = session?.user.id || "";
 
   const fetchPosts = async () => {
     try {
@@ -40,8 +45,12 @@ export default function PostList() {
       }
 
       setPosts(data.posts || data);
-    } catch {
-      setError("Something went wrong while fetching posts");
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Something went wrong while fetching posts"
+      );
     } finally {
       setLoading(false);
     }
@@ -51,27 +60,34 @@ export default function PostList() {
     fetchPosts();
   }, []);
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p className="text-red-500">{error}</p>;
+  if (loading) return <div className="p-4">Loading posts...</div>;
+  if (error) return <div className="p-4 text-red-500">{error}</div>;
 
   return (
     <div className="space-y-1 p-1 mx-auto max-w-7xl">
       {posts.map((post) => (
         <div
           key={post.id}
-          className="border p-2 rounded  cursor-pointer hover:bg-gray-50 transition"
+          className="border p-2 rounded cursor-pointer hover:bg-gray-50 transition"
         >
-          <h4
-            onClick={() => router.push(`/posts/${post.id}`)}
-            className="text-l font-semibold"
-          >
-            {post.title}
-          </h4>
+          <div className="flex justify-between items-start">
+            <h4
+              onClick={() => router.push(`/posts/${post.id}`)}
+              className="text-l font-semibold"
+            >
+              {post.title}
+            </h4>
+            {post.author && (
+              <span className="text-sm text-gray-500">
+                by {post.author.username || post.author.name || "Anonymous"}
+              </span>
+            )}
+          </div>
 
           <div className="flex flex-col sm:flex-row sm:items-center gap-4 mt-3">
             <span
               onClick={(e) => {
-                e.stopPropagation(); // Prevent outer click
+                e.stopPropagation();
                 router.push(`/posts/comment-post/${post.id}`);
               }}
               className="text-blue-600 hover:underline cursor-pointer text-sm"
@@ -93,3 +109,5 @@ export default function PostList() {
     </div>
   );
 }
+
+export default withAuth(PostList);

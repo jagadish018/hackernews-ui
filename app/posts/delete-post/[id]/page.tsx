@@ -1,7 +1,7 @@
 import React from "react";
 
-import { betterAuthClient } from "@/lib/integrations/better-auth";
 import { DeleteButton } from "../DeleteButton";
+import { betterAuthClient } from "@/lib/auth";
 
 const DeletePage = async ({ params }: { params: Promise<{ id: string }> }) => {
   const id = (await params).id;

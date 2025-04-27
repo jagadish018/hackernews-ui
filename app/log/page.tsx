@@ -1,12 +1,14 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { betterAuthClient } from "@/lib/integrations/better-auth";
+
 
 import LoginForm from "./components/LoginForm";
 import SignUpForm from "./components/SignUpForm";
 import { useRouter } from "next/navigation";
-import NavBar from "@/components/navigation-bar/Navbar";
+import { betterAuthClient } from "@/lib/auth";
+import { Navbar } from "@/components/navigation-bar/Navbar";
+
 
 const LoginPage = () => {
   const { data, refetch } = betterAuthClient.useSession();
@@ -72,7 +74,7 @@ const LoginPage = () => {
   return (
     <div className="p-4 font-sans text-sm">
       <div className="flex justify-between items-center border-b pb-2 mb-6">
-        <NavBar />
+      <Navbar/>
       </div>
 
       {!data?.user && (
