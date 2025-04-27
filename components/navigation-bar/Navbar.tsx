@@ -37,7 +37,7 @@ const Navbar = () => {
               logout
             </button>
           ) : (
-            <Link href="/login" className="hover:underline">
+            <Link href="/sign-in" className="hover:underline">
               login
             </Link>
           )}
