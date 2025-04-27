@@ -1,10 +1,9 @@
 //my login page.tsx
-
 "use client";
 import React, { useState } from "react";
-
 import { useRouter } from "next/navigation";
 import { betterAuthClient } from "@/lib/auth";
+
 const LoginPage = () => {
   const router = useRouter();
   const [loginCreds, setLoginCreds] = useState({ username: "", password: "" });
@@ -15,23 +14,43 @@ const LoginPage = () => {
     name: "",
   });
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleLogin = async () => {
     if (!loginCreds.username || !loginCreds.password) {
       setError("Please fill in all login fields.");
       return;
     }
+
     try {
+      setIsLoading(true);
       setError(null);
-      await betterAuthClient.signIn.username({
+
+      const { error: authError } = await betterAuthClient.signIn.username({
         username: loginCreds.username,
         password: loginCreds.password,
       });
-      router.push("/"); // Redirect to the homepage after successful login
+
+      if (authError) {
+        throw new Error(authError.message);
+      }
+
+      // Force a session refresh and redirect
+      await betterAuthClient.getSession();
+      router.refresh(); // Important for Next.js to update the session
+      router.push("/");
     } catch (err) {
-      setError("Login failed. Please check your credentials.");
-      console.error("Login failed:", err);
+      setError(err instanceof Error ? err.message : "Login failed");
+      console.error("Login error:", err);
+    } finally {
+      setIsLoading(false);
     }
   };
+  if (isLoading) {
+    return <p>Loading...</p>;
+  }
+
+
   const handleRegister = async () => {
     if (
       !registerCreds.username ||
@@ -42,25 +61,40 @@ const LoginPage = () => {
       setError("Please fill in all registration fields.");
       return;
     }
+
     try {
+      setIsLoading(true);
       setError(null);
-      // Attempt registration with BetterAuth signUp method
-      const response = await betterAuthClient.signUp.email({
+
+      const { error: authError } = await betterAuthClient.signUp.email({
         email: registerCreds.email,
         password: registerCreds.password,
         username: registerCreds.username,
         name: registerCreds.name,
       });
-      // If registration is successful, navigate to the homepage
-      if (response) {
-        router.push("/"); // Redirect after successful signup
+
+      if (authError) {
+        throw new Error(authError.message);
       }
+
+      // After registration, automatically log the user in
+      await betterAuthClient.signIn.username({
+        username: registerCreds.username,
+        password: registerCreds.password,
+      });
+
+      // Force a session refresh and redirect
+      await betterAuthClient.getSession();
+      router.refresh();
+      router.push("/");
     } catch (err) {
-      // Handle the error message from BetterAuth
-      setError("Signup failed. Please try again.");
-      console.error("Signup failed:", err);
+      setError(err instanceof Error ? err.message : "Registration failed");
+      console.error("Registration error:", err);
+    } finally {
+      setIsLoading(false);
     }
   };
+
   return (
     <div className="p-4 text-sm font-sans">
       {error && <p className="text-red-500 mb-2">{error}</p>}
