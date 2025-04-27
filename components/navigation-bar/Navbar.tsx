@@ -3,17 +3,10 @@
 import Link from "next/link";
 import { betterAuthClient } from "@/lib/auth";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 
 export function Navbar() {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
-  const { data: session } = betterAuthClient.useSession();
-
-  useEffect(() => {
-    // Session check is handled by useSession, just set loading to false
-    setIsLoading(false);
-  }, [session]);
+  const { data: session, isPending } = betterAuthClient.useSession();
 
   const handleSignOut = async () => {
     try {
@@ -24,7 +17,7 @@ export function Navbar() {
     }
   };
 
-  if (isLoading) {
+  if (isPending) {
     return (
       <nav className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
