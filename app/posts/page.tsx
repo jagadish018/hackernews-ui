@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { betterAuthClient } from "@/lib/auth";
-import { withAuth } from "@/components/with-auth";
+
 import { DeleteButton } from "./delete-post/DeleteButton";
 import { LikeButton } from "./like-post/LikeButton";
 
@@ -110,4 +110,4 @@ function PostList() {
   );
 }
 
-export default withAuth(PostList);
+export default PostList;
