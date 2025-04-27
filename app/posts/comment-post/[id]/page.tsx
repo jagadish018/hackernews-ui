@@ -1,5 +1,6 @@
 
-import { Navbar } from "@/components/navigation-bar/Navbar";
+
+import Navbar from "@/components/navigation-bar/Navbar";
 import CommentSection from "../CommentSection";
 
 type Post = {

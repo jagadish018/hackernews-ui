@@ -7,7 +7,8 @@ import LoginForm from "./components/LoginForm";
 import SignUpForm from "./components/SignUpForm";
 import { useRouter } from "next/navigation";
 import { betterAuthClient } from "@/lib/auth";
-import { Navbar } from "@/components/navigation-bar/Navbar";
+import Navbar from "@/components/navigation-bar/Navbar";
+
 
 
 const LoginPage = () => {

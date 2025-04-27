@@ -1,6 +1,7 @@
 import React from "react";
 import CreatePost from "./CreatePost";
-import { Navbar } from "@/components/navigation-bar/Navbar";
+import Navbar from "@/components/navigation-bar/Navbar";
+
 
 
 

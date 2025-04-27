@@ -1,6 +1,7 @@
 import React from "react";
 import PastPosts from "./PastPost";
-import { Navbar } from "@/components/navigation-bar/Navbar";
+import Navbar from "@/components/navigation-bar/Navbar";
+
 
 
 const page = () => {

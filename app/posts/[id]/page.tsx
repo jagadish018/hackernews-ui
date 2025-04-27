@@ -1,4 +1,5 @@
-import { Navbar } from "@/components/navigation-bar/Navbar";
+import Navbar from "@/components/navigation-bar/Navbar";
+
 
 type Post = {
   id: string;
