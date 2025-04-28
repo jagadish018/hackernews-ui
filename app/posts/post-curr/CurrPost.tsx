@@ -37,6 +37,7 @@ export default function CurrPost() {
         }
       } catch {
         setError("Something went wrong while fetching posts");
+        router.push("/login")
       } finally {
         setLoading(false);
       }

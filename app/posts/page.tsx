@@ -18,7 +18,7 @@ export interface Post {
     username: string;
     name?: string;
   };
-  comments: {
+  comments?: {
     id: string;
     content: string;
     createdAt: string;
@@ -29,7 +29,7 @@ export interface Post {
       name?: string;
     };
   }[];
-  likes: {
+  likes?: {
     id: string;
     createdAt: string;
     userId: string;
@@ -41,6 +41,13 @@ export interface Post {
   }[];
 }
 
+interface ApiResponse {
+  posts: Post[];
+  total: number;
+  totalPages: number;
+  currentPage: number;
+}
+
 export default function PostList() {
   const router = useRouter();
   const [posts, setPosts] = useState<Post[]>([]);
@@ -48,7 +55,7 @@ export default function PostList() {
   const [error, setError] = useState("");
   const [page, setPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
-  const limit = 5;
+  const limit = 10;
   const { data } = betterAuthClient.useSession();
   const currUser = data?.user.id || "";
 
@@ -58,24 +65,37 @@ export default function PostList() {
       const res = await fetch(`${url}/posts?page=${page}&limit=${limit}`, {
         credentials: "include",
       });
-      const responseData = await res.json();
 
       if (!res.ok) {
-        throw new Error(responseData.error || "Failed to fetch posts");
+        throw new Error(`HTTP error! status: ${res.status}`);
       }
 
-      setPosts(responseData.posts || responseData || []);
+      const responseData: ApiResponse = await res.json();
+
+      // Debugging logs
+      console.log("API Response:", responseData);
+      console.log("Total Pages:", responseData.totalPages);
+
+      setPosts(responseData.posts || []);
       setTotalPages(responseData.totalPages || 1);
-    } catch {
-      setError("Something went wrong while fetching posts");
+    } catch (err) {
+      console.error("Error fetching posts:", err);
+      setError(err instanceof Error ? err.message : "Failed to fetch posts");
+      setPosts([]);
     } finally {
       setLoading(false);
     }
-  }, [page, limit]); // Added dependencies
+  }, [page, limit]);
 
   useEffect(() => {
     fetchPosts();
-  }, [fetchPosts, page]); // Added fetchPosts to dependencies
+  }, [fetchPosts]);
+
+  // Debug current state
+  useEffect(() => {
+    console.log("Current page:", page);
+    console.log("Total pages:", totalPages);
+  }, [page, totalPages]);
 
   if (loading)
     return (
@@ -91,7 +111,7 @@ export default function PostList() {
       </div>
     );
 
-  if (posts.length === 0) {
+  if (!posts || posts.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <p className="text-center text-gray-500">No posts found.</p>
@@ -100,12 +120,12 @@ export default function PostList() {
   }
 
   return (
-    <div className="min-h-screen max-w-7xl mx-auto px-4 py-8 pb-20">
-      <div className="space-y-6">
+    <div className="min-h-screen max-w-7xl mx-auto px-4 py-2 pb-10">
+      <div className="space-y-4">
         {posts.map((post) => (
           <div
             key={post.id}
-            className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow p-6"
+            className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow p-4"
           >
             <div
               onClick={() => router.push(`/posts/${post.id}`)}
@@ -117,8 +137,8 @@ export default function PostList() {
               <p className="text-gray-600 line-clamp-3">{post.content}</p>
             </div>
 
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-4 border-t border-gray-100">
-              <div className="text-sm text-gray-500 mb-3 sm:mb-0">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-1 border-t border-gray-100">
+              <div className="text-sm text-gray-500 sm:mb-0">
                 <span>{new Date(post.createdAt).toLocaleString()}</span>
                 <span className="mx-2">•</span>
                 <Link
@@ -126,7 +146,7 @@ export default function PostList() {
                   className="text-blue-600 hover:underline"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  {post.author.name || post.author.username}
+                  {post.author?.name || post.author?.username || "Unknown"}
                 </Link>
               </div>
 
@@ -138,59 +158,59 @@ export default function PostList() {
                   }}
                   className="text-blue-600 hover:underline text-sm"
                 >
-                  {post.comments.length} Comments
+                  Comments
                 </button>
 
-                <LikeButton
-                  postId={post.id}
-                  currentUserId={currUser}
-                 
-                />
+                <LikeButton postId={post.id} currentUserId={currUser} />
 
-                <DeleteButton
-                  postId={post.id}
-                  currentUserId={currUser}
-                  postOwnerId={post.author.id}
-                  onDelete={fetchPosts}
-                />
+                {post.author?.id === currUser && (
+                  <DeleteButton
+                    postId={post.id}
+                    currentUserId={currUser}
+                    postOwnerId={post.author.id}
+                    onDelete={fetchPosts}
+                  />
+                )}
               </div>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Pagination */}
-      <div className="fixed bottom-4 left-0 right-0 flex justify-center">
-        <div className="flex items-center gap-2 sm:gap-4 bg-white p-3 rounded-lg shadow-lg border border-gray-200">
-          <button
-            disabled={page <= 1}
-            onClick={() => setPage(page - 1)}
-            className={`px-3 py-1 sm:px-4 sm:py-2 rounded-md text-sm sm:text-base ${
-              page <= 1
-                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                : "bg-blue-500 text-white hover:bg-blue-600"
-            }`}
-          >
-            Previous
-          </button>
+      {/* Pagination - Only show if there are multiple pages */}
+      {totalPages > 1 && (
+        <div className="fixed bottom-4 left-0 right-0 flex justify-center">
+          <div className="flex gap-4 bg-white p-3 rounded-lg shadow-md border border-gray-200">
+            <button
+              disabled={page <= 1}
+              onClick={() => setPage(page - 1)}
+              className={`px-4 py-2 rounded-md transition-colors ${
+                page <= 1
+                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                  : "bg-blue-500 text-white hover:bg-blue-600"
+              }`}
+            >
+              Previous
+            </button>
 
-          <div className="text-sm sm:text-base text-gray-600 px-2 sm:px-4">
-            Page {page} of {totalPages}
+            <div className="flex items-center px-4 text-gray-600">
+              Page {page} of {totalPages}
+            </div>
+
+            <button
+              disabled={page >= totalPages}
+              onClick={() => setPage(page + 1)}
+              className={`px-4 py-2 rounded-md transition-colors ${
+                page >= totalPages
+                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                  : "bg-blue-500 text-white hover:bg-blue-600"
+              }`}
+            >
+              Next
+            </button>
           </div>
-
-          <button
-            disabled={page >= totalPages}
-            onClick={() => setPage(page + 1)}
-            className={`px-3 py-1 sm:px-4 sm:py-2 rounded-md text-sm sm:text-base ${
-              page >= totalPages
-                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                : "bg-blue-500 text-white hover:bg-blue-600"
-            }`}
-          >
-            Next
-          </button>
         </div>
-      </div>
+      )}
     </div>
   );
 }
