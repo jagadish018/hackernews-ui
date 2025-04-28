@@ -1,5 +1,5 @@
-import Navbar from "@/components/navigation-bar/Navbar";
-
+import Navbar from "@/components/navigation-bar/NavigationBar";
+import { url } from "@/enviroment";
 
 type Post = {
   id: string;
@@ -23,7 +23,7 @@ type Post = {
 const page = async ({ params }: { params: Promise<{ id: string }> }) => {
   const id = (await params).id;
   const res = await fetch(
-    `https://hackernews.agreeablesmoke-a4d23e0d.centralindia.azurecontainerapps.io/posts/${id}`,
+    `${url}/posts/${id}`,
     {
       cache: "no-store",
       credentials: "include",
@@ -45,7 +45,7 @@ const page = async ({ params }: { params: Promise<{ id: string }> }) => {
     <>
       <div className="bg-[#F6F6EF] h-screen mx-auto max-w-7xl">
         <div>
-          <Navbar/>
+          <Navbar />
         </div>
         <div className="mx-auto max-w-7xl p-4 ">
           <div className=" p-2 border  cursor-pointer hover:bg-gray-50 transition">

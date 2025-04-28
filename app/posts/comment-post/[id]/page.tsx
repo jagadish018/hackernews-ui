@@ -1,7 +1,6 @@
-
-
-import Navbar from "@/components/navigation-bar/Navbar";
+import Navbar from "@/components/navigation-bar/NavigationBar";
 import CommentSection from "../CommentSection";
+import { url } from "@/enviroment";
 
 type Post = {
   id: string;
@@ -25,7 +24,7 @@ type Post = {
 const page = async ({ params }: { params: Promise<{ id: string }> }) => {
   const id = (await params).id;
   const res = await fetch(
-    `https://hackernews.agreeablesmoke-a4d23e0d.centralindia.azurecontainerapps.io/posts/${id}`,
+    `${url}/posts/${id}`,
     {
       cache: "no-store",
       credentials: "include",

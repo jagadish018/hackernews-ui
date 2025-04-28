@@ -1,15 +1,12 @@
 import React from "react";
 import NewPosts from "./NewPost";
-import Navbar from "@/components/navigation-bar/Navbar";
-
-
+import NavigationBar from "@/components/navigation-bar/NavigationBar";
 
 const page = () => {
   return (
     <>
       <div className=" mx-auto max-w-7xl  bg-[#F6F6EF] h-screen">
-        
-        <Navbar />
+    <NavigationBar/>
         <NewPosts />
       </div>
     </>

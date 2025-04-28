@@ -1,5 +1,6 @@
 "use client";
 
+import { url } from "@/enviroment";
 import { useState } from "react";
 import { MdDelete } from "react-icons/md";
 
@@ -29,7 +30,7 @@ export const DeleteButton = ({
     try {
       setLoading(true);
       const res = await fetch(
-        `https://hackernews.mangohill-f34a947a.centralindia.azurecontainerapps.io/posts/${postId}`,
+        `${url}/posts/${postId}`,
         {
           method: "DELETE",
           credentials: "include",

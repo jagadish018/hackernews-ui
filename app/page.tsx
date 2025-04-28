@@ -1,15 +1,14 @@
 // app/page.tsx
 
-import Navbar from "@/components/navigation-bar/Navbar";
 
+import NavigationBar from "@/components/navigation-bar/NavigationBar";
+import PostList from "./posts/page";
 
 export default function Home() {
   return (
-    <div className="container mx-auto p-4">
-      {/* Pass required props to your DashboardPage */}
-      <Navbar />
-      <div className="mb-10"></div>
-  
+    <div className="max-w-7xl mx-auto bg-[#f1f1db] min-h-screen">
+      <NavigationBar/>
+      <PostList />
     </div>
   );
 }
