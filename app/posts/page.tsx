@@ -172,7 +172,7 @@ export default function PostList() {
         ))}
       </div>
 
-      <div className="fixed bottom-4 left-0 right-0 flex justify-center">
+      <div className="fixed bottom-2 left-0 right-0 flex justify-center">
         <div
           className="flex gap-4 bg-white p-3 rounded-lg shadow-md border border-gray-200"
           onClick={() => {

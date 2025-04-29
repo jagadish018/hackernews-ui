@@ -1,6 +1,7 @@
 "use client";
 import { url } from "@/enviroment";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 interface Post {
@@ -19,9 +20,10 @@ const NewPosts = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [page, setPage] = useState<number>(1);
-  const [totalPages, setTotalPages] = useState<number>(1);
-  const limit = 5;
+  const [page, setPage] = useState(1);
+  const router = useRouter();
+ 
+  const limit = 4;
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -31,7 +33,6 @@ const NewPosts = () => {
         const data = await res.json();
         if (res.ok) {
           setPosts(data.posts);
-          setTotalPages(data.totalPages || 1);
         } else {
           setError(data.error || "Failed to fetch posts");
         }
@@ -73,32 +74,25 @@ const NewPosts = () => {
       </ul>
 
       {/* Pagination Controls */}
-      <div className="fixed bottom-4 left-0 right-0 flex justify-center">
-        <div className="flex gap-4 bg-white p-3 rounded-lg shadow-md border border-gray-200">
+      <div className="fixed bottom-2 left-0 right-0 flex justify-center">
+        <div
+          className="flex gap-4 bg-white p-3 rounded-lg shadow-md border border-gray-200"
+          onClick={() => {
+            router.refresh();
+          }}
+        >
           <button
-            disabled={page <= 1}
-            onClick={() => setPage(page - 1)}
-            className={`px-4 py-2 rounded-md transition-colors ${
-              page <= 1
-                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                : "bg-blue-500 text-white hover:bg-blue-600"
-            }`}
+            onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+            disabled={page === 1}
+            className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded disabled:opacity-50"
           >
-            Previous
+            Prev
           </button>
 
-          <div className="flex items-center px-4 text-gray-600">
-            Page {page} of {totalPages}
-          </div>
-
           <button
-            disabled={page >= totalPages}
-            onClick={() => setPage(page + 1)}
-            className={`px-4 py-2 rounded-md transition-colors ${
-              page >= totalPages
-                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                : "bg-blue-500 text-white hover:bg-blue-600"
-            }`}
+            onClick={() => setPage((prev) => prev + 1)}
+            disabled={posts.length < limit}
+            className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded disabled:opacity-50"
           >
             Next
           </button>
