@@ -23,13 +23,11 @@ type Post = {
 
 const page = async ({ params }: { params: Promise<{ id: string }> }) => {
   const id = (await params).id;
-  const res = await fetch(
-    `${url}/posts/${id}`,
-    {
-      cache: "no-store",
-      credentials: "include",
-    }
-  );
+  console.log(id);
+  const res = await fetch(`${url}/posts/${id}`, {
+    cache: "no-store",
+    credentials: "include",
+  });
 
   if (!res.ok) {
     return (

@@ -6,5 +6,5 @@ import { createAuthClient } from "better-auth/react";
 export const betterAuthClient = createAuthClient({
   baseURL:
     "https://hackernews.agreeablesmoke-a4d23e0d.centralindia.azurecontainerapps.io",
-  plugins: [nextCookies(), usernameClient()],
+  plugins: [usernameClient(), nextCookies()],
 });

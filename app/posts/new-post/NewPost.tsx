@@ -10,7 +10,7 @@ interface Post {
   content: string;
   createdAt: string;
   author: {
-    id: string;
+  id: string;
     username: string;
     name?: string;
   };
@@ -29,7 +29,10 @@ const NewPosts = () => {
     const fetchPosts = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`${url}/posts/new?page=${page}&limit=${limit}`);
+        const res = await fetch(`${url}/posts/new?page=${page}&limit=${limit}`, {
+          method: "POST",
+          credentials: "include",
+        });
         const data = await res.json();
         if (res.ok) {
           setPosts(data.posts);
