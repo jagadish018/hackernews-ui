@@ -55,7 +55,7 @@ export default function PostList() {
   const [error, setError] = useState("");
   const [page, setPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
-  const limit = 10;
+  const limit = 4;
   const { data } = betterAuthClient.useSession();
   const currUser = data?.user.id || "";
 
