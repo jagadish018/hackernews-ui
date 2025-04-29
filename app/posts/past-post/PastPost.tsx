@@ -21,7 +21,7 @@ const PastPosts = () => {
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
-  const limit = 5;
+  const limit = 3;
 
   useEffect(() => {
     const fetchPosts = async () => {
