@@ -53,8 +53,8 @@ export default function PostList() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [page, setPage] = useState<number>(1);
-  const [totalPages, setTotalPages] = useState<number>(1);
+  const [page, setPage] = useState(1);
+
   const limit = 4;
   const { data } = betterAuthClient.useSession();
   const currUser = data?.user.id || "";
@@ -77,7 +77,7 @@ export default function PostList() {
       console.log("Total Pages:", responseData.totalPages);
 
       setPosts(responseData.posts || []);
-      setTotalPages(responseData.totalPages || 1);
+   
     } catch (err) {
       console.error("Error fetching posts:", err);
       setError(err instanceof Error ? err.message : "Failed to fetch posts");
@@ -89,13 +89,8 @@ export default function PostList() {
 
   useEffect(() => {
     fetchPosts();
-  }, [fetchPosts]);
+  }, [page,fetchPosts]);
 
-  // Debug current state
-  useEffect(() => {
-    console.log("Current page:", page);
-    console.log("Total pages:", totalPages);
-  }, [page, totalPages]);
 
   if (loading)
     return (
@@ -177,40 +172,30 @@ export default function PostList() {
         ))}
       </div>
 
-      {/* Pagination - Only show if there are multiple pages */}
-      {totalPages > 1 && (
-        <div className="fixed bottom-4 left-0 right-0 flex justify-center">
-          <div className="flex gap-4 bg-white p-3 rounded-lg shadow-md border border-gray-200">
-            <button
-              disabled={page <= 1}
-              onClick={() => setPage(page - 1)}
-              className={`px-4 py-2 rounded-md transition-colors ${
-                page <= 1
-                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                  : "bg-blue-500 text-white hover:bg-blue-600"
-              }`}
-            >
-              Previous
-            </button>
+      <div className="fixed bottom-4 left-0 right-0 flex justify-center">
+        <div
+          className="flex gap-4 bg-white p-3 rounded-lg shadow-md border border-gray-200"
+          onClick={() => {
+            router.refresh();
+          }}
+        >
+          <button
+            onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+            disabled={page === 1}
+            className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded disabled:opacity-50"
+          >
+            Prev
+          </button>
 
-            <div className="flex items-center px-4 text-gray-600">
-              Page {page} of {totalPages}
-            </div>
-
-            <button
-              disabled={page >= totalPages}
-              onClick={() => setPage(page + 1)}
-              className={`px-4 py-2 rounded-md transition-colors ${
-                page >= totalPages
-                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                  : "bg-blue-500 text-white hover:bg-blue-600"
-              }`}
-            >
-              Next
-            </button>
-          </div>
+          <button
+            onClick={() => setPage((prev) => prev + 1)}
+            disabled={posts.length < limit}
+            className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded disabled:opacity-50"
+          >
+            Next
+          </button>
         </div>
-      )}
+      </div>
     </div>
   );
 }
