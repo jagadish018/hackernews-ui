@@ -28,13 +28,16 @@ const SignUpPage = () => {
   const handleSignUp = async () => {
     setIsLoading(true);
     try {
-      const {  error } = await betterAuthClient.signUp.email(
+      const data = await betterAuthClient.getSession();
+      console.log(data);
+
+      const { error } = await betterAuthClient.signUp.email(
         {
           username: formData.username,
           email: formData.email,
           name: formData.name,
           password: formData.password,
-          callbackURL: "http://localhost:3000/", // redirect after email verification
+         
         },
         {
           onRequest: () => {
@@ -54,9 +57,9 @@ const SignUpPage = () => {
       if (error) {
         alert(error.message || "Signup failed. Please try again.");
       }
-    } catch  {
+    } catch {
       console.error("Signup error:");
-      alert( "An unexpected error occurred.");
+      alert("An unexpected error occurred.");
     } finally {
       setIsLoading(false);
     }
