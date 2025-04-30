@@ -1,6 +1,6 @@
 "use client";
 
-import { url } from "@/enviroment";
+import { serverUrl } from "@/enviroment";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -16,7 +16,7 @@ export default function CreatePost() {
     setIsSubmitting(true);
 
     try {
-      const res = await fetch(`${url}/posts`, {
+      const res = await fetch(`${serverUrl}/posts`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -36,7 +36,7 @@ export default function CreatePost() {
       }
     } catch {
       setMessage("Error: Network error occurred");
-      router.push("/login")
+      router.push("/login");
     } finally {
       setIsSubmitting(false);
     }

@@ -2,10 +2,9 @@
 
 import NavigationBar from "@/components/navigation-bar/NavigationBar";
 import SectionWrapper from "@/components/section-wrapper/page";
-import { url } from "@/enviroment";
+import { serverUrl } from "@/enviroment";
 import { useParams } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
-
 
 interface User {
   id: string;
@@ -47,7 +46,7 @@ export default function UserProfile() {
 
     try {
       setLoading(true);
-      const res = await fetch(`${url}/users/profile/${userId}`);
+      const res = await fetch(`${serverUrl}/users/profile/${userId}`);
       const data = await res.json();
 
       if (!res.ok) {

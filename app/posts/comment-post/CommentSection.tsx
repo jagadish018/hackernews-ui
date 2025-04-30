@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import CommentForm from "./CommentForm";
 import CommentList from "./CommentList";
-import { url } from "@/enviroment";
+import { serverUrl } from "@/enviroment";
 
 type Comment = {
   id: string;
@@ -21,7 +21,6 @@ type Comment = {
   userId?: string;
 };
 
-
 const CommentSection = ({ postId }: { postId: string }) => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
@@ -34,12 +33,9 @@ const CommentSection = ({ postId }: { postId: string }) => {
     setLoading(true);
     setMessage("");
     try {
-      const res = await fetch(
-        `${url }/comments/on/${postId}`,
-        {
-          credentials: "include",
-        }
-      );
+      const res = await fetch(`${serverUrl}/comments/on/${postId}`, {
+        credentials: "include",
+      });
       const data = await res.json();
       if (res.ok) {
         setComments(data.comments || []);
@@ -63,17 +59,14 @@ const CommentSection = ({ postId }: { postId: string }) => {
     }
 
     try {
-      const res = await fetch(
-        `${url}/comments/on/${postId}`,
-        {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ content: newComment }),
-        }
-      );
+      const res = await fetch(`${serverUrl}/comments/on/${postId}`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ content: newComment }),
+      });
 
       const data = await res.json();
       if (res.ok) {
@@ -95,13 +88,10 @@ const CommentSection = ({ postId }: { postId: string }) => {
     if (!confirmed) return;
 
     try {
-      const res = await fetch(
-        `${url}/comments/${id}`,
-        {
-          method: "DELETE",
-          credentials: "include",
-        }
-      );
+      const res = await fetch(`${serverUrl}/comments/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
 
       if (res.ok) {
         setMessage("🗑️ Comment deleted.");
@@ -126,17 +116,14 @@ const CommentSection = ({ postId }: { postId: string }) => {
     }
 
     try {
-      const res = await fetch(
-        `${url}/comments/${id}`,
-        {
-          method: "PATCH",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ content: editContent }),
-        }
-      );
+      const res = await fetch(`${serverUrl}/comments/${id}`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ content: editContent }),
+      });
 
       if (res.ok) {
         setMessage("✅ Comment updated.");

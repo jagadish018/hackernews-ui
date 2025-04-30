@@ -1,5 +1,5 @@
 "use client";
-import { url } from "@/enviroment";
+import { serverUrl } from "@/enviroment";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -10,7 +10,7 @@ interface Post {
   content: string;
   createdAt: string;
   author: {
-  id: string;
+    id: string;
     username: string;
     name?: string;
   };
@@ -22,17 +22,20 @@ const NewPosts = () => {
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const router = useRouter();
- 
+
   const limit = 4;
 
   useEffect(() => {
     const fetchPosts = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`${url}/posts/new?page=${page}&limit=${limit}`, {
-          method: "POST",
-          credentials: "include",
-        });
+        const res = await fetch(
+          `${serverUrl}/posts/new?page=${page}&limit=${limit}`,
+          {
+            method: "POST",
+            credentials: "include",
+          }
+        );
         const data = await res.json();
         if (res.ok) {
           setPosts(data.posts);

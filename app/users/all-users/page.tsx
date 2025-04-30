@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { url } from "@/enviroment";
+import { serverUrl } from "@/enviroment";
 
 type User = {
   id: string;
@@ -18,9 +18,12 @@ export default function UsersList() {
   const fetchUsers = async (currentPage: number) => {
     try {
       setLoading(true);
-      const res = await fetch(`${url}/users?page=${currentPage}&limit=5`, {
-        credentials: "include",
-      });
+      const res = await fetch(
+        `${serverUrl}/users?page=${currentPage}&limit=5`,
+        {
+          credentials: "include",
+        }
+      );
 
       const data = await res.json();
 

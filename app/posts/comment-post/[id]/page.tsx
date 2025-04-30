@@ -1,6 +1,6 @@
 import Navbar from "@/components/navigation-bar/NavigationBar";
 import CommentSection from "../CommentSection";
-import { url } from "@/enviroment";
+import { serverUrl } from "@/enviroment";
 
 type Post = {
   id: string;
@@ -24,7 +24,7 @@ type Post = {
 const page = async ({ params }: { params: Promise<{ id: string }> }) => {
   const id = (await params).id;
   console.log(id);
-  const res = await fetch(`${url}/posts/${id}`, {
+  const res = await fetch(`${serverUrl}/posts/${id}`, {
     cache: "no-store",
     credentials: "include",
   });

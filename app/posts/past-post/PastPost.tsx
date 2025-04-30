@@ -1,5 +1,5 @@
 "use client";
-import { url } from "@/enviroment";
+import { serverUrl } from "@/enviroment";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -22,18 +22,17 @@ const PastPosts = () => {
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const limit = 4;
-const router = useRouter();
+  const router = useRouter();
   useEffect(() => {
     const fetchPosts = async () => {
       setLoading(true);
       try {
         const res = await fetch(
-          `${url}/posts/past?page=${page}&limit=${limit}`
+          `${serverUrl}/posts/past?page=${page}&limit=${limit}`
         );
         const data = await res.json();
         if (res.ok) {
           setPosts(data.posts);
- 
         } else {
           setError(data.error || "Failed to fetch posts");
         }

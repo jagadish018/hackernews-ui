@@ -2,10 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { url } from "@/enviroment";
+import { serverUrl } from "@/enviroment";
 import Link from "next/link";
-
-
 
 type Post = {
   id: string;
@@ -24,7 +22,7 @@ export default function CurrPost() {
     const fetchPosts = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`${url}/posts/me`, {
+        const res = await fetch(`${serverUrl}/posts/me`, {
           credentials: "include",
         });
 
@@ -37,7 +35,7 @@ export default function CurrPost() {
         }
       } catch {
         setError("Something went wrong while fetching posts");
-        router.push("/login")
+        router.push("/login");
       } finally {
         setLoading(false);
       }
@@ -65,9 +63,7 @@ export default function CurrPost() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center p-6 max-w-md">
           <h2 className="text-xl font-semibold mb-2">No posts found</h2>
-          <p className="">
-            You haven&apos;t created any posts yet
-          </p>
+          <p className="">You haven&apos;t created any posts yet</p>
           <Link
             href="/posts/create-post"
             className="inline-block bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded transition-colors"
@@ -88,13 +84,12 @@ export default function CurrPost() {
             <div
               key={post.id}
               className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-              
             >
               <div className="p-5">
                 <h2 className="text-xl font-semibold text-gray-800 mb-2 line-clamp-2">
                   {post.title}
                 </h2>
-            
+
                 <div className="flex justify-between items-center text-sm text-gray-500">
                   <span>
                     {new Date(post.createdAt).toLocaleDateString("en-US", {

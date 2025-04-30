@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { LikeButton } from "./like-post/LikeButton";
 import { DeleteButton } from "./delete-post/DeleteButton";
 import { betterAuthClient } from "@/lib/auth";
-import { url } from "@/enviroment";
+import { serverUrl } from "@/enviroment";
 import Link from "next/link";
 
 export interface Post {
@@ -62,9 +62,12 @@ export default function PostList() {
   const fetchPosts = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await fetch(`${url}/posts?page=${page}&limit=${limit}`, {
-        credentials: "include",
-      });
+      const res = await fetch(
+        `${serverUrl}/posts?page=${page}&limit=${limit}`,
+        {
+          credentials: "include",
+        }
+      );
 
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
@@ -77,7 +80,6 @@ export default function PostList() {
       console.log("Total Pages:", responseData.totalPages);
 
       setPosts(responseData.posts || []);
-   
     } catch (err) {
       console.error("Error fetching posts:", err);
       setError(err instanceof Error ? err.message : "Failed to fetch posts");
@@ -89,8 +91,7 @@ export default function PostList() {
 
   useEffect(() => {
     fetchPosts();
-  }, [page,fetchPosts]);
-
+  }, [page, fetchPosts]);
 
   if (loading)
     return (

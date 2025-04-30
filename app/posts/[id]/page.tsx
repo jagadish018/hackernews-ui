@@ -1,5 +1,5 @@
 import Navbar from "@/components/navigation-bar/NavigationBar";
-import { url } from "@/enviroment";
+import { serverUrl } from "@/enviroment";
 
 type Post = {
   id: string;
@@ -22,13 +22,10 @@ type Post = {
 
 const page = async ({ params }: { params: Promise<{ id: string }> }) => {
   const id = (await params).id;
-  const res = await fetch(
-    `${url}/posts/${id}`,
-    {
-      cache: "no-store",
-      credentials: "include",
-    }
-  );
+  const res = await fetch(`${serverUrl}/posts/${id}`, {
+    cache: "no-store",
+    credentials: "include",
+  });
 
   if (!res.ok) {
     return (

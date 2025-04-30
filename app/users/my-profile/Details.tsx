@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { url } from "@/enviroment";
+import { serverUrl } from "@/enviroment";
 import SectionWrapper from "@/components/section-wrapper/page";
 
 interface Post {
@@ -47,7 +47,7 @@ export default function MyProfile() {
   const fetchMe = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`${url}/users/me`, {
+      const res = await fetch(`${serverUrl}/users/me`, {
         credentials: "include",
       });
 
@@ -95,7 +95,7 @@ export default function MyProfile() {
               </p>
             </div>
           </SectionWrapper>
-     
+
           {/* Posts */}
           <SectionWrapper title="Posts">
             {user.posts.length > 0 ? (
@@ -156,4 +156,3 @@ export default function MyProfile() {
 }
 
 // Section Wrapper Component
-
