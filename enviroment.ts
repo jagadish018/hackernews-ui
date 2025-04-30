@@ -1,5 +1,2 @@
-export const serverUrl = process.env.SERVER_URL;
+export const serverUrl = "https://hackernews.agreeablesmoke-a4d23e0d.centralindia.azurecontainerapps.io";
 
-if (!serverUrl) {
-  throw new Error("SERVER_URL is not defined in environment variables");
-}
