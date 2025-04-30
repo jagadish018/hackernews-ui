@@ -1,17 +1,6 @@
-"use client";
 
 import { betterAuthClient } from "@/lib/auth";
 import CommentItem from "./CommentItem";
-
-type Comment = {
-  id: string;
-  content: string;
-  createdAt: string;
-  user: {
-    id: string;
-    username: string;
-  };
-};
 
 type CommentListProps = {
   comments: Comment[];
@@ -22,6 +11,22 @@ type CommentListProps = {
   onCancel: () => void;
   onSave: (id: string) => void;
   onDelete: (id: string) => void;
+};
+
+type Comment = {
+  id: string;
+  content: string;
+  createdAt: string;
+  user: {
+    username: string;
+  };
+  post: {
+    id: string;
+    title: string;
+    content: string;
+    createdAt: string;
+  };
+  userId?: string; // Optional, in case it's mapped
 };
 
 export default function CommentList({
@@ -35,16 +40,10 @@ export default function CommentList({
   onDelete,
 }: CommentListProps) {
   const { data: session } = betterAuthClient.useSession();
-  const currentUserId = session?.user?.id || "";
-
-  if (comments.length === 0) {
-    return (
-      <p className="text-gray-500">No comments yet. Be the first to comment!</p>
-    );
-  }
+  const currentUserId = session?.user?.id ?? "";
 
   return (
-    <div className="space-y-4">
+    <ul className="space-y-2">
       {comments.map((comment) => (
         <CommentItem
           key={comment.id}
@@ -57,9 +56,8 @@ export default function CommentList({
           onSave={() => onSave(comment.id)}
           onDelete={() => onDelete(comment.id)}
           currentUserId={currentUserId}
-          isOwner={comment.user.id === currentUserId}
         />
       ))}
-    </div>
+    </ul>
   );
 }

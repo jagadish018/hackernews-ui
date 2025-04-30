@@ -1,10 +1,8 @@
 "use client";
-
 import { serverUrl } from "@/enviroment";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
-import { betterAuthClient } from "@/lib/auth";
+import React, { useEffect, useState } from "react";
 
 interface Post {
   id: string;
@@ -14,123 +12,100 @@ interface Post {
   author: {
     id: string;
     username: string;
+    name?: string;
   };
 }
 
-export default function NewPosts() {
-  const router = useRouter();
-  const { data: session } = betterAuthClient.useSession();
+const NewPosts = () => {
   const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
+  const router = useRouter();
+
   const limit = 4;
 
   useEffect(() => {
     const fetchPosts = async () => {
-      if (!session?.user) return;
-
       setLoading(true);
-      setError(null);
-
       try {
         const res = await fetch(
           `${serverUrl}/posts/new?page=${page}&limit=${limit}`,
           {
+            method: "POST",
             credentials: "include",
-            cache: "no-store",
           }
         );
-
-        if (!res.ok) {
-          if (res.status === 401) {
-            router.push(`/login?from=/posts/new-post`);
-            return;
-          }
-          throw new Error("Failed to fetch posts");
-        }
-
         const data = await res.json();
-        setPosts(data.posts || []);
-        setHasMore(data.posts?.length === limit);
-      } catch (error) {
-        setError(error instanceof Error ? error.message : "Network error");
+        if (res.ok) {
+          setPosts(data.posts);
+        } else {
+          setError(data.error || "Failed to fetch posts");
+        }
+      } catch {
+        setError("Network error");
       } finally {
         setLoading(false);
       }
     };
-
     fetchPosts();
-  }, [page, session, router]);
-
-  if (!session?.user) {
-    return (
-      <div className="max-w-7xl mx-auto px-4 py-8 text-center">
-        <p>
-          Please{" "}
-          <a href={`/login?from=/posts/new-post`} className="text-orange-500">
-            login
-          </a>{" "}
-          to view new posts
-        </p>
-      </div>
-    );
-  }
+  }, [page]);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 pb-16">
-      <h2 className="text-xl font-semibold mb-6">New Posts</h2>
+    <div className="mx-auto max-w-7xl px-4 pb-16">
+      <h2 className="text-xl font-semibold mb-6">New Posts (Today)</h2>
+      {loading && <p className="text-center text-gray-500">Loading...</p>}
+      {error && <p className="text-center text-red-500">{error}</p>}
 
-      {loading && page === 1 ? (
-        <div className="flex justify-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-orange-500"></div>
-        </div>
-      ) : error ? (
-        <div className="bg-red-50 text-red-700 p-4 rounded-md">{error}</div>
-      ) : posts.length === 0 ? (
-        <p className="text-gray-500">No new posts found</p>
-      ) : (
-        <>
-          <ul className="space-y-4">
-            {posts.map((post) => (
-              <li
-                key={post.id}
-                className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+      <ul className="space-y-4">
+        {posts.map((post) => (
+          <li
+            key={post.id}
+            className="border p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+          >
+            <h3 className="font-bold text-lg">{post.title}</h3>
+            <p className="text-gray-700 mt-2">{post.content}</p>
+            <div className="mt-3 text-sm text-gray-500">
+              <span>{new Date(post.createdAt).toLocaleString()}</span>
+              <span className="mx-2">•</span>
+              <Link
+                href={`/users/profile/${post.author.id}`}
+                className="hover:text-blue-600 hover:underline"
               >
-                <Link href={`/posts/${post.id}`} className="block">
-                  <h3 className="font-bold text-lg mb-2">{post.title}</h3>
-                  <p className="text-gray-700 line-clamp-2">{post.content}</p>
-                  <div className="mt-3 text-sm text-gray-500">
-                    <span>{new Date(post.createdAt).toLocaleString()}</span>
-                    <span className="mx-2">•</span>
-                    <span className="hover:text-orange-500 hover:underline">
-                      {post.author.username}
-                    </span>
-                  </div>
-                </Link>
-              </li>
-            ))}
-          </ul>
+                {post.author.name || post.author.username}
+              </Link>
+            </div>
+          </li>
+        ))}
+      </ul>
 
-          <div className="flex justify-center mt-8 gap-4">
-            <button
-              onClick={() => setPage((p) => Math.max(p - 1, 1))}
-              disabled={page === 1 || loading}
-              className="px-4 py-2 bg-gray-200 rounded-md disabled:opacity-50"
-            >
-              Previous
-            </button>
-            <button
-              onClick={() => setPage((p) => p + 1)}
-              disabled={!hasMore || loading}
-              className="px-4 py-2 bg-gray-200 rounded-md disabled:opacity-50"
-            >
-              Next
-            </button>
-          </div>
-        </>
-      )}
+      {/* Pagination Controls */}
+      <div className="fixed bottom-2 left-0 right-0 flex justify-center">
+        <div
+          className="flex gap-4 bg-white p-3 rounded-lg shadow-md border border-gray-200"
+          onClick={() => {
+            router.refresh();
+          }}
+        >
+          <button
+            onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+            disabled={page === 1}
+            className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded disabled:opacity-50"
+          >
+            Prev
+          </button>
+
+          <button
+            onClick={() => setPage((prev) => prev + 1)}
+            disabled={posts.length < limit}
+            className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
+      </div>
     </div>
   );
-}
+};
+
+export default NewPosts;

@@ -3,71 +3,61 @@
 import { serverUrl } from "@/enviroment";
 import { useState } from "react";
 import { MdDelete } from "react-icons/md";
-import { betterAuthClient } from "@/lib/auth";
 
 type DeleteButtonProps = {
   postId: string;
   postOwnerId: string;
-  onDelete?: () => void;
+  currentUserId: string;
+  onDelete?: () => void; // Optional callback
 };
 
 export const DeleteButton = ({
   postId,
   postOwnerId,
+  currentUserId,
   onDelete,
 }: DeleteButtonProps) => {
-  const { data: session } = betterAuthClient.useSession();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+
+  const isOwner = postOwnerId === currentUserId;
 
   const handleDelete = async () => {
-    if (!session?.user) return;
-
     const confirmed = window.confirm(
       "Are you sure you want to delete this post?"
     );
     if (!confirmed) return;
 
-    setLoading(true);
-    setError(null);
-
     try {
+      setLoading(true);
       const res = await fetch(`${serverUrl}/posts/${postId}`, {
         method: "DELETE",
         credentials: "include",
       });
 
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.message || "Failed to delete post");
-      }
+      const data = await res.json();
 
-      onDelete?.();
-    } catch (error) {
-      setError(error instanceof Error ? error.message : "An error occurred");
+      if (res.ok) {
+        onDelete?.(); // Trigger parent callback to refresh or refetch
+      } else {
+        alert(data.error || "❌ Failed to delete post.");
+      }
+    } catch {
+      alert("❌ Error deleting post.");
     } finally {
       setLoading(false);
     }
   };
 
-  if (session?.user?.id !== postOwnerId) return null;
+  if (!isOwner) return null;
 
   return (
-    <div className="relative">
-      <button
-        onClick={handleDelete}
-        disabled={loading}
-        aria-label="Delete post"
-        className="flex items-center gap-1 text-red-600 hover:text-red-800 disabled:opacity-50"
-      >
-        <MdDelete size={18} />
-        {loading ? "Deleting..." : "Delete"}
-      </button>
-      {error && (
-        <div className="absolute top-full left-0 mt-1 text-xs text-red-600">
-          {error}
-        </div>
-      )}
-    </div>
+    <button
+      onClick={handleDelete}
+      aria-label="Delete Post"
+      className="text-red-600 hover:text-red-800 flex items-center gap-1 text-sm"
+    >
+      <MdDelete size={18} />
+      {loading ? "Deleting..." : "Delete"}
+    </button>
   );
 };
