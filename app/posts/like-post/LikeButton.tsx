@@ -1,76 +1,102 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { getLikes, likePost, unlikePost } from "./api";
-import { SlLike } from "react-icons/sl";
-import { SlDislike } from "react-icons/sl";
+import { likePost, unlikePost, getLikes } from "./api";
+import { SlLike, SlDislike } from "react-icons/sl";
+import { useRouter } from "next/navigation";
+import { betterAuthClient } from "@/lib/auth";
 
 type Props = {
   postId: string;
   currentUserId: string;
+  onLikeChange?: () => void;
 };
 
-export const LikeButton = ({ postId, currentUserId }: Props) => {
-  const [likes, setLikes] = useState<
-    { id: string; user: { id: string; name: string | null } }[]
-  >([]);
+export const LikeButton = ({ postId, currentUserId, onLikeChange }: Props) => {
+  const router = useRouter();
+  const [likes, setLikes] = useState<Array<{ id: string; userId: string }>>([]);
   const [loading, setLoading] = useState(false);
-  const [liked, setLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(0);
+  const [error, setError] = useState<string | null>(null);
+  const { data: session } = betterAuthClient.useSession();
+
+  const liked = likes.some((like) => like.userId === currentUserId);
+  const likeCount = likes.length;
 
   const fetchLikes = useCallback(async () => {
-    const res = await getLikes(postId);
-    if (res.status === "SUCCESS") {
-      setLikes(res.likes);
-      setLikeCount(res.likes.length);
-    } else {
-      setLikes([]);
-      setLikeCount(0);
+    try {
+      const result = await getLikes(postId);
+      if (result.status === "SUCCESS") {
+        setLikes(result.likes || []);
+      } else {
+        setError(result.message || "Failed to fetch likes");
+      }
+    } catch (err) {
+      setError("Network error occurred");
+      console.error("Fetch likes error:", err);
     }
-  }, [postId]);
 
+  }, [postId]);
   useEffect(() => {
     fetchLikes();
   }, [fetchLikes]);
 
-  useEffect(() => {
-    const isLiked = likes.some((like) => like.user.id === currentUserId);
-    setLiked(isLiked);
-  }, [likes, currentUserId]);
-
-  const handleLike = async () => {
-    setLoading(true);
-    const res = await likePost(postId);
-    if (res.status === "SUCCESS") {
-      setLikeCount((prevCount) => prevCount + 1);
+  const handleLikeAction = async () => {
+    if (!session?.user) {
+      router.push(`/login?from=/posts/${postId}`);
+      return;
     }
-    await fetchLikes();
-    setLiked(true);
-    setLoading(false);
-  };
 
-  const handleUnlike = async () => {
     setLoading(true);
-    const res = await unlikePost(postId);
-    if (res.status === "SUCCESS") {
-      setLikeCount((prevCount) => Math.max(prevCount - 1, 0));
+    setError(null);
+
+    try {
+      if (liked) {
+        const result = await unlikePost(postId);
+        if (result.status !== "SUCCESS") {
+          throw new Error(result.message || "Failed to unlike");
+        }
+      } else {
+        const result = await likePost(postId);
+        if (result.status !== "SUCCESS") {
+          throw new Error(result.message || "Failed to like");
+        }
+      }
+      await fetchLikes();
+      onLikeChange?.();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Action failed");
+      console.error("Like action error:", err);
+    } finally {
+      setLoading(false);
     }
-    await fetchLikes();
-    setLiked(false);
-    setLoading(false);
   };
 
   return (
-    <div className="flex gap-2 items-center justify-center">
+    <div className="flex items-center gap-2">
       <button
-        onClick={liked ? handleUnlike : handleLike}
+        onClick={handleLikeAction}
         disabled={loading}
-        className={`text-xl ${liked ? "text-blue-500" : "text-red-700"} transition-colors duration-200`}
-        aria-label={liked ? "Unlike" : "Like"}
+        className={`p-1 rounded-full transition-colors ${
+          liked
+            ? "text-blue-500 hover:bg-blue-50"
+            : "text-gray-500 hover:bg-gray-100"
+        }`}
+        aria-label={liked ? "Unlike post" : "Like post"}
       >
-        {liked ? <SlDislike size={15} /> : <SlLike size={15} />}
+        {liked ? (
+          <SlDislike size={16} className="fill-current" />
+        ) : (
+          <SlLike size={16} className="fill-current" />
+        )}
       </button>
-      <span className="ml-2">{likeCount}</span>
+      <span className="text-sm text-gray-600 min-w-[20px] text-center">
+        {likeCount}
+      </span>
+      {error && (
+        <span className="text-xs text-red-500 ml-2" role="alert">
+          {error}
+        </span>
+      )}
     </div>
   );
 };

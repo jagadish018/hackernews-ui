@@ -8,7 +8,7 @@ import { betterAuthClient } from "@/lib/auth";
 import { serverUrl } from "@/enviroment";
 import Link from "next/link";
 
-export interface Post {
+interface Post {
   id: string;
   title: string;
   content: string;
@@ -20,121 +20,156 @@ export interface Post {
   };
   comments?: {
     id: string;
-    content: string;
-    createdAt: string;
     userId: string;
-    user: {
-      id: string;
-      username: string;
-      name?: string;
-    };
   }[];
   likes?: {
     id: string;
-    createdAt: string;
     userId: string;
-    user: {
-      id: string;
-      username: string;
-      name?: string;
-    };
   }[];
 }
 
 interface ApiResponse {
   posts: Post[];
   total: number;
-  totalPages: number;
-  currentPage: number;
+  hasMore: boolean;
 }
 
 export default function PostList() {
   const router = useRouter();
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [page, setPage] = useState(1);
+  const { data: session } = betterAuthClient.useSession();
+  const [state, setState] = useState<{
+    posts: Post[];
+    loading: boolean;
+    error: string | null;
+    page: number;
+    hasMore: boolean;
+  }>({
+    posts: [],
+    loading: true,
+    error: null,
+    page: 1,
+    hasMore: true,
+  });
 
-  const limit = 4;
-  const { data } = betterAuthClient.useSession();
-  const currUser = data?.user.id || "";
+  const limit = 10;
 
   const fetchPosts = useCallback(async () => {
+    if (!session?.user) return;
+
     try {
-      setLoading(true);
+      setState((prev) => ({ ...prev, loading: true, error: null }));
+
       const res = await fetch(
-        `${serverUrl}/posts?page=${page}&limit=${limit}`,
+        `${serverUrl}/posts?page=${state.page}&limit=${limit}`,
         {
           credentials: "include",
+          cache: "no-store",
+          headers: {
+            "Content-Type": "application/json",
+          },
         }
       );
 
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
+      if (res.status === 401) {
+        router.push(`/login?from=/posts?page=${state.page}`);
+        return;
       }
 
-      const responseData: ApiResponse = await res.json();
+      if (!res.ok) {
+        throw new Error(`Failed to fetch posts: ${res.status}`);
+      }
 
-      // Debugging logs
-      console.log("API Response:", responseData);
-      console.log("Total Pages:", responseData.totalPages);
-
-      setPosts(responseData.posts || []);
+      const data: ApiResponse = await res.json();
+      setState((prev) => ({
+        ...prev,
+        posts: data.posts,
+        loading: false,
+        hasMore: data.hasMore,
+      }));
     } catch (err) {
-      console.error("Error fetching posts:", err);
-      setError(err instanceof Error ? err.message : "Failed to fetch posts");
-      setPosts([]);
-    } finally {
-      setLoading(false);
+      setState((prev) => ({
+        ...prev,
+        loading: false,
+        error: err instanceof Error ? err.message : "Failed to fetch posts",
+      }));
     }
-  }, [page, limit]);
+  }, [state.page, session, router]);
 
   useEffect(() => {
     fetchPosts();
-  }, [page, fetchPosts]);
+  }, [fetchPosts]);
 
-  if (loading)
+  const handlePageChange = (newPage: number) => {
+    setState((prev) => ({ ...prev, page: newPage }));
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  if (!session?.user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-center text-gray-500">Loading posts...</p>
+        <p className="text-center">
+          Please{" "}
+          <a href={`/login?from=/posts`} className="text-blue-600">
+            login
+          </a>{" "}
+          to view posts
+        </p>
       </div>
     );
+  }
 
-  if (error)
+  if (state.loading && state.page === 1) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-center text-red-500 max-w-md px-4">{error}</p>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
       </div>
     );
+  }
 
-  if (!posts || posts.length === 0) {
+  if (state.error) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-center text-gray-500">No posts found.</p>
+        <div className="max-w-md p-4 bg-red-50 text-red-700 rounded">
+          <p className="text-center">{state.error}</p>
+          <button
+            onClick={fetchPosts}
+            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!state.posts.length) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-center text-gray-500">No posts found</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen max-w-7xl mx-auto px-4 py-2 pb-10">
-      <div className="space-y-4">
-        {posts.map((post) => (
-          <div
+    <div className="min-h-screen max-w-7xl mx-auto px-4 py-8">
+      <div className="space-y-6">
+        {state.posts.map((post) => (
+          <article
             key={post.id}
-            className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow p-4"
+            className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
           >
             <div
               onClick={() => router.push(`/posts/${post.id}`)}
-              className="cursor-pointer mb-4"
+              className="p-4 cursor-pointer"
             >
-              <h3 className="text-xl font-bold text-gray-800 mb-2">
+              <h2 className="text-xl font-bold text-gray-800 mb-2">
                 {post.title}
-              </h3>
-              <p className="text-gray-600 line-clamp-3">{post.content}</p>
+              </h2>
+              <p className="text-gray-600 line-clamp-3 mb-4">{post.content}</p>
             </div>
 
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-1 border-t border-gray-100">
-              <div className="text-sm text-gray-500 sm:mb-0">
+            <div className="px-4 py-3 bg-gray-50 border-t border-gray-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+              <div className="text-sm text-gray-500">
                 <span>{new Date(post.createdAt).toLocaleString()}</span>
                 <span className="mx-2">•</span>
                 <Link
@@ -142,7 +177,7 @@ export default function PostList() {
                   className="text-blue-600 hover:underline"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  {post.author?.name || post.author?.username || "Unknown"}
+                  {post.author?.name || post.author?.username}
                 </Link>
               </div>
 
@@ -154,48 +189,43 @@ export default function PostList() {
                   }}
                   className="text-blue-600 hover:underline text-sm"
                 >
-                  Comments
+                  Comments ({post.comments?.length || 0})
                 </button>
 
-                <LikeButton postId={post.id} currentUserId={currUser} />
+                <LikeButton
+                  postId={post.id}
+                  currentUserId={session.user.id}
+                  onLikeChange={fetchPosts}
+                />
 
-                {post.author?.id === currUser && (
+                {post.author?.id === session.user.id && (
                   <DeleteButton
                     postId={post.id}
-                    currentUserId={currUser}
                     postOwnerId={post.author.id}
                     onDelete={fetchPosts}
                   />
                 )}
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          </article>
 
-      <div className="fixed bottom-2 left-0 right-0 flex justify-center">
-        <div
-          className="flex gap-4 bg-white p-3 rounded-lg shadow-md border border-gray-200"
-          onClick={() => {
-            router.refresh();
-          }}
+        ))}      </div>
+      <div className="mt-8 flex justify-center gap-4">
+        <button
+          onClick={() => handlePageChange(state.page - 1)}
+          disabled={state.page === 1 || state.loading}
+          className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
         >
-          <button
-            onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-            disabled={page === 1}
-            className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded disabled:opacity-50"
-          >
-            Prev
-          </button>
-
-          <button
-            onClick={() => setPage((prev) => prev + 1)}
-            disabled={posts.length < limit}
-            className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded disabled:opacity-50"
-          >
-            Next
-          </button>
-        </div>
+          Previous
+        </button>
+        <span className="px-4 py-2">{state.page}</span>
+        <button
+          onClick={() => handlePageChange(state.page + 1)}
+          disabled={!state.hasMore || state.loading}
+          className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+        >
+          Next
+        </button>
       </div>
     </div>
   );

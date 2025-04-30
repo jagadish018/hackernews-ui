@@ -1,3 +1,15 @@
+"use client";
+
+type Comment = {
+  id: string;
+  content: string;
+  createdAt: string;
+  user: {
+    id: string;
+    username: string;
+  };
+};
+
 type CommentItemProps = {
   comment: Comment;
   isEditing: boolean;
@@ -8,22 +20,7 @@ type CommentItemProps = {
   onSave: () => void;
   onDelete: () => void;
   currentUserId: string;
-};
-
-type Comment = {
-  id: string;
-  content: string;
-  createdAt: string;
-  user: {
-    username: string;
-  };
-  post: {
-    id: string;
-    title: string;
-    content: string;
-    createdAt: string;
-  }
-  userId?: string; // Optional, in case you map it from the backend or session
+  isOwner: boolean;
 };
 
 export default function CommentItem({
@@ -35,55 +32,60 @@ export default function CommentItem({
   onCancel,
   onSave,
   onDelete,
-  currentUserId,
+  isOwner,
 }: CommentItemProps) {
-  const isOwner = comment.userId === currentUserId; // Adjust based on your data structure
-
   return (
-    <li className="border p-2 rounded shadow">
-      {isEditing && isOwner ? (
-        <>
+    <div className="border-b border-gray-200 py-4">
+      {isEditing ? (
+        <div className="space-y-2">
           <textarea
-            className="w-full border p-2 mb-2"
-            rows={2}
             value={editContent}
             onChange={(e) => onEditChange(e.target.value)}
+            className="w-full border border-gray-300 rounded p-2"
+            rows={3}
           />
           <div className="flex gap-2">
             <button
               onClick={onSave}
-              className="px-3 py-1 bg-green-500 text-white rounded"
+              className="bg-green-500 text-white px-3 py-1 rounded"
             >
               Save
             </button>
             <button
               onClick={onCancel}
-              className="px-3 py-1 bg-gray-400 text-white rounded"
+              className="bg-gray-500 text-white px-3 py-1 rounded"
             >
               Cancel
             </button>
           </div>
-        </>
+        </div>
       ) : (
-        <>
-          <p>{comment.content}</p>
-          <p className="text-xs text-gray-500">
-            by {comment.user.username} •{" "}
-            {new Date(comment.createdAt).toLocaleString()}
-          </p>
-
-          {isOwner && (
-            <div className="flex gap-2 mt-1">
-              <button onClick={onEdit} className="text-blue-600 text-sm">
-                Edit
-              </button>
-              <button onClick={onDelete} className="text-red-600 text-sm">
-                Delete
-              </button>
-            </div>
-          )}
-        </>
+        <div>
+          <p className="whitespace-pre-line">{comment.content}</p>
+          <div className="flex justify-between items-center mt-2 text-sm text-gray-500">
+            <span>
+              by {comment.user.username} •{" "}
+              {new Date(comment.createdAt).toLocaleString()}
+            </span>
+            {isOwner && (
+              <div className="flex gap-2">
+                <button
+                  onClick={onEdit}
+                  className="text-orange-500 hover:underline"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={onDelete}
+                  className="text-red-500 hover:underline"
+                >
+                  Delete
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
       )}
-    </li>
+    </div>
   );
 }

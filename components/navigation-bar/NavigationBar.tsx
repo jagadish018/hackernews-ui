@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { betterAuthClient } from "@/lib/auth";
 
@@ -20,9 +20,14 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
   hideNavItems = false,
 }) => {
   const router = useRouter();
-  const { data } = betterAuthClient.useSession();
+  const { data, isPending: status } = betterAuthClient.useSession();
   const user = data?.user;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleNavigation = (path: string) => {
     router.push(path);
@@ -30,10 +35,17 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
   };
 
   const handleSignOut = async () => {
-    await betterAuthClient.signOut();
-    router.push("/");
-    setIsMenuOpen(false);
+    try {
+      await betterAuthClient.signOut();
+      // Force full page reload to clear all client-side state
+      window.location.href = "/";
+    } catch (error) {
+      console.error("Sign out error:", error);
+    }
   };
+
+  // Don't render anything on the server
+  if (!isClient) return null;
 
   return (
     <div className="max-w-7xl mx-auto sticky top-0 z-50">
@@ -52,13 +64,14 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
             </span>
 
             {/* Desktop Navigation Items */}
-            {!hideNavItems && (
+            {!hideNavItems && !status && (
               <div className="hidden md:flex ml-2 space-x-1">
                 {navItems.map((item, index) => (
                   <React.Fragment key={item.label}>
                     <button
                       onClick={() => handleNavigation(item.path)}
                       className="cursor-pointer hover:underline whitespace-nowrap"
+                      disabled={status}
                     >
                       {item.label}
                     </button>
@@ -74,6 +87,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="text-black focus:outline-none"
+              aria-label="Toggle menu"
             >
               {isMenuOpen ? (
                 <svg
@@ -110,11 +124,12 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
           {/* Right side - Auth Links (Desktop) */}
           <div className="hidden md:flex items-center gap-2">
             {!hideNavItems &&
+              !status &&
               (user ? (
                 <>
                   <Link href="/users/my-profile" prefetch={false}>
                     <span className="cursor-pointer hover:underline">
-                      {user.name}
+                      {user.name || user.username}
                     </span>
                   </Link>
                   <span>|</span>
@@ -140,13 +155,14 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
         {isMenuOpen && (
           <div className="md:hidden bg-[#ff6600] px-2 pt-2 pb-4">
             {/* Mobile Navigation Items */}
-            {!hideNavItems && (
+            {!hideNavItems && !status && (
               <div className="flex flex-col space-y-2">
                 {navItems.map((item) => (
                   <button
                     key={item.label}
                     onClick={() => handleNavigation(item.path)}
                     className="cursor-pointer hover:underline text-left py-1"
+                    disabled={status}
                   >
                     {item.label}
                   </button>
@@ -157,11 +173,12 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
             {/* Mobile Auth Links */}
             <div className="mt-4 pt-2 border-t border-orange-700">
               {!hideNavItems &&
+                !status &&
                 (user ? (
                   <div className="flex flex-col space-y-2">
                     <Link href="/users/my-profile" prefetch={false}>
                       <span className="cursor-pointer hover:underline py-1 block">
-                        {user.name}
+                        {user.name || user.username}
                       </span>
                     </Link>
                     <button
@@ -185,6 +202,4 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
       </div>
     </div>
   );
-};
-
-export default NavigationBar;
+};export default NavigationBar;
