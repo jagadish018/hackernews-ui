@@ -65,7 +65,9 @@ export default function PostList() {
       const res = await fetch(
         `${serverUrl}/posts?page=${page}&limit=${limit}`,
         {
+          method: "GET",
           credentials: "include",
+          
         }
       );
 

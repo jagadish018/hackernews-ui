@@ -23,6 +23,7 @@ export default function CurrPost() {
       try {
         setLoading(true);
         const res = await fetch(`${serverUrl}/posts/me`, {
+          method: "GET",
           credentials: "include",
         });
 

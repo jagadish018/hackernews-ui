@@ -32,7 +32,7 @@ const NewPosts = () => {
         const res = await fetch(
           `${serverUrl}/posts/new?page=${page}&limit=${limit}`,
           {
-            method: "POST",
+            method: "GET",
             credentials: "include",
           }
         );

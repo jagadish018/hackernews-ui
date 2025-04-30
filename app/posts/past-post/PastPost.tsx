@@ -28,7 +28,12 @@ const PastPosts = () => {
       setLoading(true);
       try {
         const res = await fetch(
-          `${serverUrl}/posts/past?page=${page}&limit=${limit}`
+          `${serverUrl}/posts/past?page=${page}&limit=${limit}`, {
+            credentials: "include",
+            method: "GET",
+          }
+     
+          
         );
         const data = await res.json();
         if (res.ok) {
