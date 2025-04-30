@@ -7,4 +7,5 @@ export const betterAuthClient = createAuthClient({
   baseURL:
     "https://hackernews.agreeablesmoke-a4d23e0d.centralindia.azurecontainerapps.io",
   plugins: [usernameClient(), nextCookies()],
+  
 });
