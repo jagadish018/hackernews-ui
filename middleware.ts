@@ -13,5 +13,11 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/posts"], // Protect these routes
+  matcher: [
+    "/posts/create-post/:path*",
+    "/posts/comment-post/:path*",
+    "/posts/delete-post/:path*",
+    "/posts/like-post/:path*",
+    "/users/my-profile",
+  ], // Protect these routes
 };
