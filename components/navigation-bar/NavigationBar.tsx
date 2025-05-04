@@ -12,7 +12,7 @@ interface NavigationBarProps {
 const navItems = [
   { label: "new", path: "/posts/new-post" },
   { label: "past", path: "/posts/past-post" },
-  { label: "create post", path: "/posts/create-post" },
+  { label: "create post", path:"/posts/create-post" },
   { label: "my post", path: "/posts/post-curr" },
 ];
 

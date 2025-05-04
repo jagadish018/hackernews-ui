@@ -60,7 +60,6 @@ const CommentSection = ({ postId }: { postId: string }) => {
 
     try {
       const res = await fetch(`${serverUrl}/comments/on/${postId}`, {
-        method: "POST",
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
