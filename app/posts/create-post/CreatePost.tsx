@@ -36,7 +36,7 @@ export default function CreatePost() {
       }
     } catch {
       setMessage("Error: Network error occurred");
-      router.push("/login");
+    
     } finally {
       setIsSubmitting(false);
     }
