@@ -1,3 +1,21 @@
+
+
+type Comment = {
+  id: string;
+  content: string;
+  createdAt: string;
+  user: {
+    id: string; // Made required for proper ownership checks
+    username: string;
+  };
+  post: {
+    id: string;
+    title: string;
+    content: string;
+    createdAt: string;
+  };
+};
+
 type CommentItemProps = {
   comment: Comment;
   isEditing: boolean;
@@ -7,23 +25,8 @@ type CommentItemProps = {
   onCancel: () => void;
   onSave: () => void;
   onDelete: () => void;
-  currentUserId: string;
-};
-
-type Comment = {
-  id: string;
-  content: string;
-  createdAt: string;
-  user: {
-    username: string;
-  };
-  post: {
-    id: string;
-    title: string;
-    content: string;
-    createdAt: string;
-  }
-  userId?: string; // Optional, in case you map it from the backend or session
+  canEdit: boolean; // Explicit permission props
+  canDelete: boolean;
 };
 
 export default function CommentItem({
@@ -35,51 +38,68 @@ export default function CommentItem({
   onCancel,
   onSave,
   onDelete,
-  currentUserId,
+  canEdit,
+  canDelete,
 }: CommentItemProps) {
-  const isOwner = comment.userId === currentUserId; // Adjust based on your data structure
-
   return (
-    <li className="border p-2 rounded shadow">
-      {isEditing && isOwner ? (
+    <li className="border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
+      <div className="flex justify-between items-start mb-2">
+        <span className="font-medium text-gray-700">
+          {comment.user.username}
+        </span>
+        <span className="text-xs text-gray-500">
+          {new Date(comment.createdAt).toLocaleString()}
+        </span>
+      </div>
+
+      {isEditing ? (
         <>
           <textarea
-            className="w-full border p-2 mb-2"
-            rows={2}
+            className="w-full border border-gray-300 rounded-md p-2 mb-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            rows={3}
             value={editContent}
             onChange={(e) => onEditChange(e.target.value)}
+            autoFocus
           />
-          <div className="flex gap-2">
-            <button
-              onClick={onSave}
-              className="px-3 py-1 bg-green-500 text-white rounded"
-            >
-              Save
-            </button>
+          <div className="flex justify-end gap-2">
             <button
               onClick={onCancel}
-              className="px-3 py-1 bg-gray-400 text-white rounded"
+              className="px-3 py-1 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors text-sm"
             >
               Cancel
+            </button>
+            <button
+              onClick={onSave}
+              className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm"
+            >
+              Save Changes
             </button>
           </div>
         </>
       ) : (
         <>
-          <p>{comment.content}</p>
-          <p className="text-xs text-gray-500">
-            by {comment.user.username} •{" "}
-            {new Date(comment.createdAt).toLocaleString()}
+          <p className="text-gray-800 mb-3 whitespace-pre-wrap">
+            {comment.content}
           </p>
 
-          {isOwner && (
-            <div className="flex gap-2 mt-1">
-              <button onClick={onEdit} className="text-blue-600 text-sm">
-                Edit
-              </button>
-              <button onClick={onDelete} className="text-red-600 text-sm">
-                Delete
-              </button>
+          {(canEdit || canDelete) && (
+            <div className="flex justify-end gap-3 border-t pt-2">
+              {canEdit && (
+                <button
+                  onClick={onEdit}
+                  className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                >
+                  Edit
+                </button>
+              )}
+              {canDelete && (
+                <button
+                  onClick={onDelete}
+                  className="text-red-600 hover:text-red-800 text-sm font-medium"
+                >
+                  Delete
+                </button>
+              )}
             </div>
           )}
         </>

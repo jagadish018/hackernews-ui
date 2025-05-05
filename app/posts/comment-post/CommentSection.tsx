@@ -4,12 +4,14 @@ import { useEffect, useState, useCallback } from "react";
 import CommentForm from "./CommentForm";
 import CommentList from "./CommentList";
 import { serverUrl } from "@/enviroment";
+import { betterAuthClient } from "@/lib/auth";
 
 type Comment = {
   id: string;
   content: string;
   createdAt: string;
   user: {
+    id: string;
     username: string;
   };
   post: {
@@ -18,10 +20,10 @@ type Comment = {
     content: string;
     createdAt: string;
   };
-  userId?: string;
 };
 
 const CommentSection = ({ postId }: { postId: string }) => {
+  const { data: session } = betterAuthClient.useSession();
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
   const [loading, setLoading] = useState(true);
@@ -53,6 +55,11 @@ const CommentSection = ({ postId }: { postId: string }) => {
     e.preventDefault();
     setMessage("");
 
+    if (!session?.user) {
+      setMessage("⚠️ You must be logged in to comment");
+      return;
+    }
+
     if (newComment.trim() === "") {
       setMessage("⚠️ Please enter a comment before submitting.");
       return;
@@ -60,6 +67,7 @@ const CommentSection = ({ postId }: { postId: string }) => {
 
     try {
       const res = await fetch(`${serverUrl}/comments/on/${postId}`, {
+        method: "POST",
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
@@ -81,6 +89,17 @@ const CommentSection = ({ postId }: { postId: string }) => {
   };
 
   const handleDelete = async (id: string) => {
+    if (!session?.user) {
+      setMessage("⚠️ You must be logged in to delete comments");
+      return;
+    }
+
+    const comment = comments.find((c) => c.id === id);
+    if (comment?.user.id !== session.user.id) {
+      setMessage("⚠️ You can only delete your own comments");
+      return;
+    }
+
     const confirmed = window.confirm(
       "Are you sure you want to delete this comment?"
     );
@@ -104,11 +123,27 @@ const CommentSection = ({ postId }: { postId: string }) => {
   };
 
   const handleEdit = (id: string, currentContent: string) => {
+    if (!session?.user) {
+      setMessage("⚠️ You must be logged in to edit comments");
+      return;
+    }
+
+    const comment = comments.find((c) => c.id === id);
+    if (comment?.user.id !== session.user.id) {
+      setMessage("⚠️ You can only edit your own comments");
+      return;
+    }
+
     setEditingCommentId(id);
     setEditContent(currentContent);
   };
 
   const handleUpdate = async (id: string) => {
+    if (!session?.user) {
+      setMessage("⚠️ You must be logged in to edit comments");
+      return;
+    }
+
     if (!editContent.trim()) {
       setMessage("⚠️ Comment content can't be empty.");
       return;
@@ -145,11 +180,17 @@ const CommentSection = ({ postId }: { postId: string }) => {
     <div className="space-y-4 mt-8">
       <h3 className="text-lg font-semibold">Comments</h3>
 
-      <CommentForm
-        newComment={newComment}
-        onChange={setNewComment}
-        onSubmit={handleSubmit}
-      />
+      {session?.user ? (
+        <CommentForm
+          newComment={newComment}
+          onChange={setNewComment}
+          onSubmit={handleSubmit}
+        />
+      ) : (
+        <p className="text-sm text-gray-600">
+          Please log in to leave a comment
+        </p>
+      )}
 
       {message && (
         <p
@@ -170,6 +211,7 @@ const CommentSection = ({ postId }: { postId: string }) => {
       ) : (
         <CommentList
           comments={comments}
+          currentUserId={session?.user?.id || ""}
           editingCommentId={editingCommentId}
           editContent={editContent}
           onEdit={handleEdit}
@@ -181,6 +223,6 @@ const CommentSection = ({ postId }: { postId: string }) => {
       )}
     </div>
   );
-};
 
+};
 export default CommentSection;
