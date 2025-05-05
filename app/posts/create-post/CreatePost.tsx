@@ -1,92 +1,122 @@
 "use client";
+import React, { useState } from "react";
 
-import { serverUrl } from "@/enviroment";
-import { betterAuthClient } from "@/lib/auth";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { betterAuthClient } from "@/lib/auth";
+import { serverUrl } from "@/enviroment";
 
-export default function CreatePost() {
-  const { data: session, isPending } = betterAuthClient.useSession();
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [message, setMessage] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+const CreatePostPage = () => {
+  const { data: session } = betterAuthClient.useSession();
   const router = useRouter();
-
-  useEffect(() => {
-    if (!isPending && !session) {
-      router.push("/login"); // Redirect if unauthenticated
+  const [formData, setFormData] = useState({
+    title: "",
+    content: "",
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+  const handleSubmit = async () => {
+    if (!formData.title.trim()) {
+      alert("Title is required!");
+      return;
     }
-  }, [isPending, session, router]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
     setIsSubmitting(true);
-
     try {
       const res = await fetch(`${serverUrl}/posts`, {
         method: "POST",
-        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ title, content }),
+        body: JSON.stringify({
+          title: formData.title,
+          content: formData.content,
+        }),
+        credentials: "include",
       });
-
-      const data = await res.json();
-      if (res.ok) {
-        setTitle("");
-        setContent("");
-        setMessage("Post created successfully!");
-        setTimeout(() => router.push("/"), 1500);
-      } else {
-        setMessage(`Error: ${data.error || "Failed to create post"}`);
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Failed to create post");
       }
-    } catch {
-      setMessage("Error: Network error occurred");
+      const data = await res.json();
+      console.log("Post created:", data);
+      alert("Post created successfully!");
+      router.push("/");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error("Create post error:", error);
+        alert(error.message || "An error occurred while creating post.");
+      } else {
+        console.error("Unknown error:", error);
+        alert("An unknown error occurred while creating post.");
+      }
     } finally {
       setIsSubmitting(false);
     }
   };
-
-  if (isPending) {
-    return <p className="p-4">Checking authentication...</p>;
-  }
-
-  if (!session) return null; // Avoid flicker
-
-  return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
-           {" "}
-      <div className="max-w-5xl mx-auto">
-               {" "}
-        <div className="bg-white shadow-md rounded-lg p-6 sm:p-8">
-                   {" "}
-          <h1 className="text-2xl font-bold text-gray-800 mb-6">
-                        Create New Post          {" "}
-          </h1>
-                   {" "}
-          <form onSubmit={handleSubmit} className="space-y-6">
-                        {/* Title input */}            {/* Content input */}   
-                    {/* Submit and Cancel buttons */}         {" "}
-          </form>
-                   {" "}
-          {message && (
-            <div
-              className={`mt-6 p-4 rounded-lg ${
-                message.includes("Error")
-                  ? "bg-red-50 text-red-700"
-                  : "bg-green-50 text-green-700"
-              }`}
-            >
-                            {message}           {" "}
-            </div>
-          )}
-                 {" "}
+  if (!session?.user) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-[#F1F1DB]">
+        <div className="text-center p-8 bg-white rounded-2xl shadow-md">
+          <h2 className="text-2xl font-bold mb-4 text-red-600">
+            You must be logged in to create a post!
+          </h2>
+          <button
+            onClick={() => router.push("/login")}
+            className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
+          >
+            Go to Login
+          </button>
         </div>
-             {" "}
       </div>
-         {" "}
+    );
+  }
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-[#F1F1DB]">
+      <div className="w-full max-w-lg p-8 bg-white rounded-2xl shadow-lg">
+        <h1 className="text-2xl font-bold mb-6 text-amber-900 text-center">
+          Create a New Post
+        </h1>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Title
+            </label>
+            <input
+              type="text"
+              name="title"
+              value={formData.title}
+              onChange={handleChange}
+              className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Content
+            </label>
+            <textarea
+              name="content"
+              value={formData.content}
+              onChange={handleChange}
+              rows={5}
+              className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+            />
+          </div>
+          <button
+            onClick={handleSubmit}
+            disabled={isSubmitting}
+            className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 transition-colors disabled:opacity-50"
+          >
+            {isSubmitting ? "Creating post..." : "Create Post"}
+          </button>
+        </div>
+      </div>
     </div>
   );
-}
+};
+export default CreatePostPage;
